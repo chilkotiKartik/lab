@@ -13,10 +13,10 @@
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 260 100% 60%;
+    --secondary: 280 65% 60%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 240 3.7% 15.9%;
@@ -33,6 +33,13 @@
     --ring: 240 4.9% 83.9%;
 
     --radius: 0.5rem;
+
+    /* Chart colors */
+    --chart-1: 217.2 91.2% 59.8%;
+    --chart-2: 280 65% 60%;
+    --chart-3: 120 65% 55%;
+    --chart-4: 35 91.2% 55.8%;
+    --chart-5: 0 91.2% 65.8%;
   }
 
   .light {
@@ -72,44 +79,38 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-.cosmic-gradient {
-  background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Space theme styles */
+.font-space {
+  font-family: "Space Grotesk", system-ui, sans-serif;
 }
 
 .cosmic-bg {
-  background: radial-gradient(
-    circle at 50% 50%,
-    hsl(var(--primary) / 0.2),
-    hsl(var(--secondary) / 0.1),
-    transparent 70%
-  );
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
 }
 
 .space-dots {
-  background-image: radial-gradient(hsl(var(--primary) / 0.15) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
   background-size: 30px 30px;
 }
 
-.glow {
-  box-shadow: 0 0 15px hsl(var(--primary) / 0.3), 0 0 30px hsl(var(--secondary) / 0.2);
+.cosmic-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500;
+}
+
+.cosmic-gradient-btn {
+  @apply bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 transition-all duration-300;
 }
 
 .glow-text {
-  text-shadow: 0 0 5px hsl(var(--primary) / 0.5), 0 0 10px hsl(var(--secondary) / 0.3);
+  text-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
 }
 
-.parallax-container {
-  perspective: 1000px;
-}
-
-.parallax-layer {
-  transform-style: preserve-3d;
-  transition: transform 0.5s ease-out;
+.cosmic-glow {
+  box-shadow: 0 0 15px rgba(79, 70, 229, 0.5);
 }
 
 .card-hover {
@@ -117,47 +118,30 @@
 }
 
 .card-hover:hover {
+  box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 15px hsl(var(--primary) / 0.3);
 }
 
+/* Animation classes */
 .grid-animation {
-  animation: fadeInUp 0.8s ease forwards;
-  opacity: 0;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .staggered-animation:nth-child(1) {
-  animation-delay: 0.1s;
+  transition-delay: 0.1s;
 }
+
 .staggered-animation:nth-child(2) {
-  animation-delay: 0.2s;
+  transition-delay: 0.2s;
 }
+
 .staggered-animation:nth-child(3) {
-  animation-delay: 0.3s;
+  transition-delay: 0.3s;
 }
-.staggered-animation:nth-child(4) {
-  animation-delay: 0.4s;
-}
-.staggered-animation:nth-child(5) {
-  animation-delay: 0.5s;
-}
-.staggered-animation:nth-child(6) {
-  animation-delay: 0.6s;
-}
-.staggered-animation:nth-child(7) {
-  animation-delay: 0.7s;
-}
-.staggered-animation:nth-child(8) {
-  animation-delay: 0.8s;
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .glow-text {
+    text-shadow: 0 0 5px rgba(79, 70, 229, 0.3);
+  }
 }

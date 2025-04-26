@@ -28,7 +28,6 @@ import {
   Clock,
   Calendar,
 } from "lucide-react"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/components/auth-provider"
 import { SpaceBackground } from "@/components/space-background"
@@ -36,6 +35,7 @@ import { SpaceParticles } from "@/components/space-particles"
 import { CommentDialog } from "@/components/comment-dialog"
 import { CharacterAvatar } from "@/components/character-avatar"
 import { FloatingCharacter } from "@/components/floating-character"
+import { CharacterGroup } from "@/components/character-group"
 
 export default function Home() {
   const { toast } = useToast()
@@ -89,8 +89,9 @@ export default function Home() {
       status: "Active",
       progress: 75,
       team: [
-        { name: "Dr. Elara Vega", avatar: "https://randomuser.me/api/portraits/women/1.jpg" },
-        { name: "Prof. Kai Zhang", avatar: "https://randomuser.me/api/portraits/men/2.jpg" },
+        { role: "teacher", variant: 1 },
+        { role: "student", variant: 2 },
+        { role: "student", variant: 3 },
       ],
       likes: 42,
       comments: 12,
@@ -105,8 +106,9 @@ export default function Home() {
       status: "Active",
       progress: 60,
       team: [
-        { name: "Dr. Aiden Mercer", avatar: "https://randomuser.me/api/portraits/men/3.jpg" },
-        { name: "Dr. Lyra Chen", avatar: "https://randomuser.me/api/portraits/women/4.jpg" },
+        { role: "teacher", variant: 4 },
+        { role: "student", variant: 1 },
+        { role: "student", variant: 5 },
       ],
       likes: 38,
       comments: 9,
@@ -121,8 +123,10 @@ export default function Home() {
       status: "Planning",
       progress: 25,
       team: [
-        { name: "Dr. Elara Vega", avatar: "https://randomuser.me/api/portraits/women/1.jpg" },
-        { name: "Dr. Aiden Mercer", avatar: "https://randomuser.me/api/portraits/men/3.jpg" },
+        { role: "teacher", variant: 2 },
+        { role: "student", variant: 4 },
+        { role: "student", variant: 3 },
+        { role: "student", variant: 1 },
       ],
       likes: 27,
       comments: 5,
@@ -139,7 +143,8 @@ export default function Home() {
       category: "Spacecraft",
       image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=500&auto=format&fit=crop",
       author: "Dr. Elara Vega",
-      avatar: "https://randomuser.me/api/portraits/women/1.jpg",
+      authorRole: "teacher",
+      authorVariant: 1,
       excerpt:
         "This paper explores the application of quantum computing principles to spacecraft navigation systems, enabling unprecedented accuracy for interplanetary travel.",
       likes: 56,
@@ -153,7 +158,8 @@ export default function Home() {
       category: "Drones",
       image: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?q=80&w=500&auto=format&fit=crop",
       author: "Prof. Kai Zhang",
-      avatar: "https://randomuser.me/api/portraits/men/2.jpg",
+      authorRole: "teacher",
+      authorVariant: 3,
       excerpt:
         "This research presents novel drone designs inspired by peregrine falcons, enabling efficient high-altitude atmospheric sampling with minimal energy consumption.",
       likes: 42,
@@ -167,7 +173,8 @@ export default function Home() {
       category: "Satellites",
       image: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=500&auto=format&fit=crop",
       author: "Dr. Aiden Mercer",
-      avatar: "https://randomuser.me/api/portraits/men/3.jpg",
+      authorRole: "teacher",
+      authorVariant: 2,
       excerpt:
         "This paper introduces a new class of self-healing composite materials designed to protect satellites from micrometeoroid impacts and space debris.",
       likes: 38,
@@ -336,7 +343,7 @@ export default function Home() {
         <motion.div className="absolute inset-0 z-0 space-dots" style={{ y: springY, opacity: springOpacity }} />
         <div className="absolute inset-0 z-0 cosmic-bg"></div>
 
-        {/* Floating astronaut animation */}
+        {/* Floating character animations */}
         <div className="absolute right-10 top-1/4 z-10 hidden md:block">
           <FloatingCharacter role="student" size="lg" />
         </div>
@@ -345,6 +352,9 @@ export default function Home() {
         </div>
         <div className="absolute right-1/4 bottom-1/4 z-10 hidden md:block">
           <FloatingCharacter role="admin" size="sm" delay={0.5} />
+        </div>
+        <div className="absolute left-1/4 top-1/3 z-10 hidden md:block">
+          <FloatingCharacter role="student" size="sm" variant={3} delay={1.5} />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -512,14 +522,7 @@ export default function Home() {
 
                   {/* Team members */}
                   <div className="flex items-center mb-4">
-                    <div className="flex -space-x-2 mr-2">
-                      {project.team.map((member, i) => (
-                        <Avatar key={i} className="border-2 border-background w-8 h-8">
-                          <AvatarImage src={member.avatar || "/placeholder.svg"} alt={member.name} />
-                          <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                      ))}
-                    </div>
+                    <CharacterGroup characters={project.team} size="xs" className="mr-2" />
                     <span className="text-xs text-muted-foreground">{project.team.length} team members</span>
                   </div>
 
@@ -715,10 +718,12 @@ export default function Home() {
                 </div>
                 <div className="p-6">
                   <div className="flex items-center mb-3">
-                    <Avatar className="h-8 w-8 mr-2">
-                      <AvatarImage src={research.avatar || "/placeholder.svg"} alt={research.author} />
-                      <AvatarFallback>{research.author?.charAt(0) || "A"}</AvatarFallback>
-                    </Avatar>
+                    <CharacterAvatar
+                      role={research.authorRole}
+                      variant={research.authorVariant}
+                      size="sm"
+                      className="mr-2"
+                    />
                     <span className="text-sm">{research.author || "Anonymous Researcher"}</span>
                   </div>
                   <h3 className="text-xl font-bold font-space mb-2">{research.title}</h3>
@@ -784,8 +789,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Our Journey - Enhanced with animations */}
-
       {/* Team Showcase */}
       <div className="py-20 bg-background relative">
         <div className="absolute inset-0 space-dots opacity-30"></div>
@@ -810,30 +813,34 @@ export default function Home() {
               {
                 name: "Dr. Elara Vega",
                 role: "Founder & Lead Researcher",
-                avatar: "https://randomuser.me/api/portraits/women/1.jpg",
                 specialty: "Spacecraft Design",
                 bio: "Ph.D. in Aerospace Engineering with 15+ years of experience in spacecraft design and quantum navigation systems.",
+                variant: 1,
+                userRole: "teacher",
               },
               {
                 name: "Prof. Kai Zhang",
                 role: "Chief Technology Officer",
-                avatar: "https://randomuser.me/api/portraits/men/2.jpg",
                 specialty: "Drone Technology",
                 bio: "Former NASA engineer specializing in biomimetic drone designs and autonomous navigation systems.",
+                variant: 2,
+                userRole: "teacher",
               },
               {
                 name: "Dr. Aiden Mercer",
                 role: "Head of Materials Research",
-                avatar: "https://randomuser.me/api/portraits/men/3.jpg",
                 specialty: "Advanced Materials",
                 bio: "Pioneer in self-healing composite materials for spacecraft and satellite protection systems.",
+                variant: 3,
+                userRole: "teacher",
               },
               {
                 name: "Dr. Lyra Chen",
                 role: "Quantum Computing Specialist",
-                avatar: "https://randomuser.me/api/portraits/women/4.jpg",
                 specialty: "Quantum Navigation",
                 bio: "Leading expert in applying quantum computing principles to aerospace navigation and communication.",
+                variant: 4,
+                userRole: "teacher",
               },
             ].map((member, index) => (
               <motion.div
@@ -846,12 +853,13 @@ export default function Home() {
                 whileHover={{ y: -5 }}
               >
                 <div className="bg-card/50 backdrop-blur-sm rounded-xl border border-border overflow-hidden card-hover">
-                  <div className="relative h-64 overflow-hidden">
-                    <Image
-                      src={member.avatar || "/placeholder.svg"}
-                      alt={member.name}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  <div className="relative h-64 overflow-hidden flex items-center justify-center">
+                    <CharacterAvatar
+                      role={member.userRole as any}
+                      variant={member.variant}
+                      size="xl"
+                      animation="pulse"
+                      className="transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
@@ -947,21 +955,24 @@ export default function Home() {
                   "Avasya's quantum navigation research has revolutionized how we approach interplanetary missions. Their team's expertise is unmatched.",
                 author: "Dr. Sarah Chen",
                 role: "Director of Space Exploration, Global Space Agency",
-                avatar: "https://randomuser.me/api/portraits/women/11.jpg",
+                userRole: "admin",
+                variant: 1,
               },
               {
                 quote:
                   "The biomimetic drone designs developed by Avasya have opened up entirely new possibilities for atmospheric research in extreme environments.",
                 author: "Prof. James Wilson",
                 role: "Head of Environmental Sciences, University of Cambridge",
-                avatar: "https://randomuser.me/api/portraits/men/12.jpg",
+                userRole: "teacher",
+                variant: 5,
               },
               {
                 quote:
                   "Working with Avasya on self-healing materials has been a game-changer for our satellite protection systems. Truly innovative research.",
                 author: "Dr. Maria Rodriguez",
                 role: "Chief Engineer, Orbital Systems Inc.",
-                avatar: "https://randomuser.me/api/portraits/women/13.jpg",
+                userRole: "teacher",
+                variant: 2,
               },
             ].map((testimonial, index) => (
               <motion.div
@@ -985,11 +996,7 @@ export default function Home() {
                   </motion.div>
                   <p className="flex-1 italic text-muted-foreground mb-6">{testimonial.quote}</p>
                   <div className="flex items-center">
-                    <CharacterAvatar
-                      role={index === 0 ? "admin" : index === 1 ? "teacher" : "student"}
-                      size="sm"
-                      variant={index + 1}
-                    />
+                    <CharacterAvatar role={testimonial.userRole as any} size="sm" variant={testimonial.variant} />
                     <div>
                       <div className="font-medium">{testimonial.author}</div>
                       <div className="text-xs text-muted-foreground">{testimonial.role}</div>

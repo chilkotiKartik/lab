@@ -8,31 +8,48 @@ interface FloatingCharacterProps {
   role?: UserRole
   size?: "sm" | "md" | "lg" | "xl"
   variant?: number
-  className?: string
   delay?: number
+  className?: string
 }
 
 export function FloatingCharacter({
   role = "student",
   size = "md",
   variant,
-  className,
   delay = 0,
+  className,
 }: FloatingCharacterProps) {
+  // Generate a random orbit path
+  const orbitRadius = size === "sm" ? 20 : size === "md" ? 30 : 40
+  const orbitDuration = 15 + Math.random() * 10 // Between 15-25 seconds
+  const orbitDelay = delay
+  const startAngle = Math.random() * 360 // Random start position
+
+  // Create a circular path with some randomness
+  const path = {
+    x: [0, orbitRadius, 0, -orbitRadius, 0],
+    y: [0, orbitRadius / 2, 0, -orbitRadius / 2, 0],
+    rotate: [0, 10, 0, -10, 0],
+  }
+
   return (
     <motion.div
-      initial={{ y: 0, rotate: 0 }}
-      animate={{
-        y: [0, -20, 0],
-        rotate: [0, 5, -5, 0],
-      }}
-      transition={{
-        y: { repeat: Number.POSITIVE_INFINITY, duration: 4, ease: "easeInOut", delay },
-        rotate: { repeat: Number.POSITIVE_INFINITY, duration: 8, ease: "easeInOut", delay },
-      }}
       className={className}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1, delay: orbitDelay }}
     >
-      <CharacterAvatar role={role} size={size} variant={variant} />
+      <motion.div
+        animate={path}
+        transition={{
+          duration: orbitDuration,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
+          delay: orbitDelay,
+        }}
+      >
+        <CharacterAvatar role={role} size={size} variant={variant} animation="pulse" className="cosmic-glow" />
+      </motion.div>
     </motion.div>
   )
 }

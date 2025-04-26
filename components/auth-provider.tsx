@@ -117,17 +117,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Find user based on role and email
     if (role === "student") {
-      foundUser = MOCK_USERS.students.find((u) => u.email === email)
+      foundUser = MOCK_USERS.students.find((u) => u.email === email || u.id === email)
     } else if (role === "teacher") {
       foundUser = MOCK_USERS.teachers.find((u) => u.email === email || u.id === email)
     } else if (role === "admin") {
-      foundUser = MOCK_USERS.admins.find((u) => u.email === email)
+      foundUser = MOCK_USERS.admins.find((u) => u.email === email || u.id === email)
     }
 
-    // Check if user exists and password is correct (in a real app, you'd hash passwords)
-    if (foundUser && password === "12345") {
+    // For demo purposes, accept any password
+    if (foundUser) {
       setUser(foundUser)
       localStorage.setItem("avasya_user", JSON.stringify(foundUser))
+      setIsLoading(false)
+      return true
+    }
+
+    // For demo purposes, create a new user if not found
+    if (!foundUser && email && password) {
+      const newUser: User = {
+        id: `${role[0]}${Math.floor(Math.random() * 1000)}`,
+        name: email.split("@")[0],
+        email: email,
+        role: role,
+        level: 1,
+        points: 0,
+        progress: 0,
+        joinDate: new Date().toISOString().split("T")[0],
+      }
+
+      setUser(newUser)
+      localStorage.setItem("avasya_user", JSON.stringify(newUser))
       setIsLoading(false)
       return true
     }

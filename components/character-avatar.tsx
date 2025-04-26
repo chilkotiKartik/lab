@@ -50,13 +50,13 @@ export function CharacterAvatar({
     // Return different images based on role
     switch (role) {
       case "student":
-        return `/images/student-${randomVariant}.png`
+        return `/images/astronaut-${randomVariant}.png`
       case "teacher":
-        return `/images/teacher-${randomVariant}.png`
+        return `/images/astronaut-${randomVariant}.png`
       case "admin":
-        return `/images/admin-${randomVariant}.png`
+        return `/images/astronaut-${randomVariant}.png`
       default:
-        return `/images/student-1.png`
+        return `/images/astronaut-1.png`
     }
   }
 
