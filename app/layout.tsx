@@ -8,6 +8,8 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { PageTransition } from "@/components/page-transition"
 import { AchievementsNotification } from "@/components/achievements-notification"
+import { WelcomeAnimation } from "@/components/welcome-animation"
+import { ChatSystem } from "@/components/chat-system"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -27,6 +29,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
+            <WelcomeAnimation />
             <div className="flex min-h-screen flex-col">
               <Header />
               <PageTransition>
@@ -35,6 +38,7 @@ export default function RootLayout({
               <Footer />
             </div>
             <AchievementsNotification />
+            <ChatSystem />
           </AuthProvider>
         </ThemeProvider>
       </body>

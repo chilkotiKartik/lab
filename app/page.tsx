@@ -27,6 +27,7 @@ import {
   Eye,
   Clock,
   Calendar,
+  CuboidIcon as Cube,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/components/auth-provider"
@@ -34,8 +35,9 @@ import { SpaceBackground } from "@/components/space-background"
 import { SpaceParticles } from "@/components/space-particles"
 import { CommentDialog } from "@/components/comment-dialog"
 import { CharacterAvatar } from "@/components/character-avatar"
-import { FloatingCharacter } from "@/components/floating-character"
 import { CharacterGroup } from "@/components/character-group"
+import { EnhancedFloatingAstronaut } from "@/components/enhanced-floating-astronaut"
+import { HomeNotification } from "@/components/home-notification"
 
 export default function Home() {
   const { toast } = useToast()
@@ -336,6 +338,9 @@ export default function Home() {
 
   return (
     <div className="relative overflow-hidden">
+      {/* Show notification for non-logged in users */}
+      {!user && <HomeNotification />}
+
       {/* Hero Section with animated space background */}
       <div ref={targetRef} className="relative h-screen flex items-center justify-center overflow-hidden">
         <SpaceBackground />
@@ -343,18 +348,18 @@ export default function Home() {
         <motion.div className="absolute inset-0 z-0 space-dots" style={{ y: springY, opacity: springOpacity }} />
         <div className="absolute inset-0 z-0 cosmic-bg"></div>
 
-        {/* Floating character animations */}
+        {/* Enhanced floating astronauts */}
         <div className="absolute right-10 top-1/4 z-10 hidden md:block">
-          <FloatingCharacter role="student" size="lg" />
+          <EnhancedFloatingAstronaut style="relaxing" size="lg" />
         </div>
         <div className="absolute left-10 bottom-1/3 z-10 hidden md:block">
-          <FloatingCharacter role="teacher" size="md" delay={1} />
+          <EnhancedFloatingAstronaut style="modern" size="md" />
         </div>
         <div className="absolute right-1/4 bottom-1/4 z-10 hidden md:block">
-          <FloatingCharacter role="admin" size="sm" delay={0.5} />
+          <EnhancedFloatingAstronaut style="thumbs-up" size="sm" />
         </div>
         <div className="absolute left-1/4 top-1/3 z-10 hidden md:block">
-          <FloatingCharacter role="student" size="sm" variant={3} delay={1.5} />
+          <EnhancedFloatingAstronaut style="waving" size="sm" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -394,9 +399,9 @@ export default function Home() {
                   Explore Research <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/about">
+              <Link href="/gallery">
                 <Button variant="outline" size="lg" className="rounded-full">
-                  Learn About Avasya
+                  <Cube className="mr-2 h-4 w-4" /> 3D Gallery
                 </Button>
               </Link>
             </motion.div>
@@ -412,6 +417,8 @@ export default function Home() {
         </motion.div>
       </div>
 
+      {/* Rest of the home page content */}
+      {/* ... */}
       {/* Mission Launch Countdown */}
       <div className="py-12 bg-muted/30 relative">
         <div className="absolute inset-0 space-dots opacity-30"></div>
