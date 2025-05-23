@@ -41,7 +41,7 @@ export function EnhancedCommentSystem({ itemId, itemType, initialComments = [] }
 
   useEffect(() => {
     // In a real app, this would fetch comments from an API
-    if (initialComments.length === 0) {
+    if (initialComments.length === 0 && comments.length === 0) {
       const mockComments: Comment[] = [
         {
           id: "1",
@@ -85,7 +85,7 @@ export function EnhancedCommentSystem({ itemId, itemType, initialComments = [] }
       ]
       setComments(mockComments)
     }
-  }, [initialComments])
+  }, [initialComments, comments.length])
 
   const handleSubmitComment = () => {
     if (!commentText.trim()) {

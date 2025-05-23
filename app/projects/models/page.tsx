@@ -275,11 +275,13 @@ export default function ModelsPage() {
 
   // Check if user has viewed the models page
   useEffect(() => {
-    if (user && !hasAchievement("view_3d_models")) {
+    if (user && typeof hasAchievement === "function" && !hasAchievement("view_3d_models")) {
       // Add a small delay to make it feel more natural
       setTimeout(() => {
-        addAchievement("view_3d_models", "3D Explorer", "View interactive 3D models", 15)
-        triggerAchievement("3D Explorer", "You've unlocked the 3D model viewer", 15)
+        if (typeof addAchievement === "function") {
+          addAchievement("view_3d_models", "3D Explorer", "View interactive 3D models", 15)
+          triggerAchievement("3D Explorer", "You've unlocked the 3D model viewer", 15)
+        }
       }, 2000)
     }
 
