@@ -5,13 +5,15 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 
 interface EnhancedFloatingAstronautProps {
-  size?: "sm" | "md" | "lg" | "xl"
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
   position?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "center" | "random"
-  style?: "classic" | "modern" | "relaxing" | "waving" | "thumbs-up" | "random"
+  style?: "classic" | "modern" | "relaxing" | "waving" | "thumbs-up" | "3d-purple" | "random"
   interactive?: boolean
   withShadow?: boolean
+  withGlow?: boolean
   className?: string
   onClick?: () => void
+  delay?: number
 }
 
 export function EnhancedFloatingAstronaut({
@@ -20,25 +22,30 @@ export function EnhancedFloatingAstronaut({
   style = "random",
   interactive = true,
   withShadow = true,
+  withGlow = false,
   className = "",
   onClick,
+  delay = 0,
 }: EnhancedFloatingAstronautProps) {
   const [astronautStyle, setAstronautStyle] = useState(style)
   const [astronautPosition, setAstronautPosition] = useState<{
-    top: string
-    left: string
+    top?: string
+    left?: string
     right?: string
     bottom?: string
+    transform?: string
   }>({ top: "0", left: "0" })
   const [isHovered, setIsHovered] = useState(false)
   const [rotation, setRotation] = useState(0)
 
   // Size mapping
   const sizeMap = {
+    xs: { width: 60, height: 60 },
     sm: { width: 80, height: 80 },
     md: { width: 120, height: 120 },
     lg: { width: 180, height: 180 },
     xl: { width: 240, height: 240 },
+    "2xl": { width: 320, height: 320 },
   }
 
   // Style mapping to image paths
@@ -48,12 +55,14 @@ export function EnhancedFloatingAstronaut({
     relaxing: "/images/relaxing-astronaut.png",
     waving: "/images/astronaut-2.png",
     "thumbs-up": "/images/astronaut-3.png",
+    "3d-purple": "/images/astronaut-3d-purple.png",
     random: [
       "/images/astronaut.png",
       "/images/astronaut-1.png",
       "/images/relaxing-astronaut.png",
       "/images/astronaut-2.png",
       "/images/astronaut-3.png",
+      "/images/astronaut-3d-purple.png",
     ],
   }
 
@@ -73,6 +82,8 @@ export function EnhancedFloatingAstronaut({
       { top: "20%", right: "40%", left: "auto" },
       { bottom: "30%", left: "25%", top: "auto" },
       { top: "35%", right: "15%", left: "auto" },
+      { top: "25%", left: "30%" },
+      { bottom: "40%", right: "30%", top: "auto", left: "auto" },
     ],
   }
 
@@ -129,15 +140,16 @@ export function EnhancedFloatingAstronaut({
         y: [0, -15, 0],
       }}
       transition={{
+        delay,
         duration: 3,
         y: {
           repeat: Number.POSITIVE_INFINITY,
-          duration: 4,
+          duration: 4 + Math.random() * 2,
           ease: "easeInOut",
         },
         rotate: {
           repeat: Number.POSITIVE_INFINITY,
-          duration: 8,
+          duration: 8 + Math.random() * 4,
           ease: "easeInOut",
           repeatType: "reverse",
         },
@@ -162,8 +174,8 @@ export function EnhancedFloatingAstronaut({
           width={width}
           height={height}
           className={`${withShadow ? "drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" : ""} ${
-            interactive ? "cursor-pointer" : ""
-          }`}
+            withGlow ? "drop-shadow-[0_0_25px_rgba(147,51,234,0.5)]" : ""
+          } ${interactive ? "cursor-pointer" : ""}`}
         />
 
         {isHovered && interactive && (

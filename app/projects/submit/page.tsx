@@ -5,37 +5,37 @@ import { motion } from "framer-motion"
 import { EnhancedSubmissionForm } from "@/components/enhanced-submission-form"
 import { EnhancedFloatingAstronaut } from "@/components/enhanced-floating-astronaut"
 
-export default function CreateResearchPage() {
+export default function SubmitProjectPage() {
   const router = useRouter()
 
   const handleSubmit = (data: any) => {
     // Add to localStorage for demo purposes
-    const newResearch = {
+    const newProject = {
       id: Date.now(),
       title: data.title,
-      excerpt: data.description,
+      description: data.description,
       category: data.category,
-      author: "Current User",
-      date: new Date().toLocaleDateString(),
+      status: "Planning",
+      progress: 0,
+      team: [{ role: "student", variant: 1 }],
+      likes: 0,
+      comments: 0,
+      views: 0,
+      lastUpdated: "Just now",
       image: data.image ? URL.createObjectURL(data.image) : "/placeholder.svg?height=300&width=500",
-      stats: {
-        views: 0,
-        likes: 0,
-        comments: 0,
-      },
     }
 
-    const existingResearch = JSON.parse(localStorage.getItem("avasya_research") || "[]")
-    existingResearch.unshift(newResearch)
-    localStorage.setItem("avasya_research", JSON.stringify(existingResearch.slice(0, 20)))
+    const existingProjects = JSON.parse(localStorage.getItem("avasya_projects") || "[]")
+    existingProjects.unshift(newProject)
+    localStorage.setItem("avasya_projects", JSON.stringify(existingProjects.slice(0, 20)))
 
     setTimeout(() => {
-      router.push("/research")
+      router.push("/projects")
     }, 3000)
   }
 
   const handleCancel = () => {
-    router.push("/research")
+    router.push("/projects")
   }
 
   return (
@@ -48,17 +48,17 @@ export default function CreateResearchPage() {
         {/* Enhanced floating astronauts */}
         <EnhancedFloatingAstronaut
           style="3d-purple"
-          size="lg"
-          position="top-right"
+          size="xl"
+          position="top-left"
           withGlow
           className="hidden lg:block"
         />
         <EnhancedFloatingAstronaut
-          style="modern"
-          size="md"
-          position="bottom-left"
+          style="thumbs-up"
+          size="sm"
+          position="bottom-right"
           className="hidden lg:block"
-          delay={0.5}
+          delay={0.8}
         />
 
         <div className="container mx-auto px-4 relative z-10">
@@ -69,7 +69,7 @@ export default function CreateResearchPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              Publish Your <span className="cosmic-gradient">Research</span>
+              Submit Your <span className="cosmic-gradient">Project</span>
             </motion.h1>
 
             <motion.p
@@ -78,7 +78,7 @@ export default function CreateResearchPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
             >
-              Share your findings with the aerospace research community.
+              Share your innovative projects with the Avasya community.
             </motion.p>
           </div>
         </div>
@@ -87,7 +87,7 @@ export default function CreateResearchPage() {
       {/* Form Section */}
       <div className="py-12 md:py-20 relative">
         <div className="container mx-auto px-4">
-          <EnhancedSubmissionForm type="research" onSubmit={handleSubmit} onCancel={handleCancel} />
+          <EnhancedSubmissionForm type="project" onSubmit={handleSubmit} onCancel={handleCancel} />
         </div>
       </div>
     </div>
