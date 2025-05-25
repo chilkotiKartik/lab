@@ -3,6 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { getSupabaseClient } from "@/lib/supabase-service"
 
 // Define user roles
 export type UserRole = "student" | "teacher" | "admin"
@@ -12,76 +13,23 @@ export interface User {
   id: string
   name: string
   email: string
+  roll_number?: string
   role: UserRole
-  avatar?: string
+  department?: string
+  specialization?: string
+  area_of_work?: string
+  avatar_url?: string
   level?: number
   points?: number
   progress?: number
-  department?: string
-  specialization?: string
-  joinDate?: string
-}
-
-// Mock users for demo
-const MOCK_USERS = {
-  students: [
-    {
-      id: "s001",
-      name: "Alex Johnson",
-      email: "alex@avasya-lab.com",
-      role: "student" as UserRole,
-      level: 2,
-      points: 175,
-      progress: 45,
-      department: "Aerospace Engineering",
-      joinDate: "2023-01-15",
-    },
-    {
-      id: "s002",
-      name: "Maya Patel",
-      email: "maya@avasya-lab.com",
-      role: "student" as UserRole,
-      level: 3,
-      points: 230,
-      progress: 65,
-      department: "Quantum Physics",
-      joinDate: "2022-09-10",
-    },
-  ],
-  teachers: [
-    {
-      id: "t001",
-      name: "Dr. Rajesh Kumar",
-      email: "rajesh@akit.edu.in",
-      role: "teacher" as UserRole,
-      specialization: "Quantum Navigation",
-      department: "Advanced Physics",
-      joinDate: "2021-06-20",
-    },
-    {
-      id: "t002",
-      name: "Prof. Sarah Chen",
-      email: "sarah@akit.edu.in",
-      role: "teacher" as UserRole,
-      specialization: "Biomimetic Engineering",
-      department: "Aerospace Design",
-      joinDate: "2020-08-15",
-    },
-  ],
-  admins: [
-    {
-      id: "a001",
-      name: "Admin User",
-      email: "admin@avasya-lab.com",
-      role: "admin" as UserRole,
-    },
-  ],
+  join_date?: string
+  is_active?: boolean
 }
 
 // Create auth context
 interface AuthContextType {
   user: User | null
-  login: (email: string, password: string, role: UserRole) => Promise<boolean>
+  login: (identifier: string, password: string) => Promise<boolean>
   logout: () => void
   isLoading: boolean
 }
@@ -101,58 +49,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(JSON.parse(storedUser))
       } catch (error) {
         console.error("Failed to parse stored user", error)
+        localStorage.removeItem("avasya_user")
       }
     }
     setIsLoading(false)
   }, [])
 
-  // Login function
-  const login = async (email: string, password: string, role: UserRole): Promise<boolean> => {
+  // Login function with real database integration
+  const login = async (identifier: string, password: string): Promise<boolean> => {
     setIsLoading(true)
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const supabase = getSupabaseClient()
 
-    let foundUser: User | undefined
+      // Try to find user by email or roll number
+      const { data: userData, error } = await supabase
+        .from("users")
+        .select("*")
+        .or(`email.eq.${identifier},roll_number.eq.${identifier}`)
+        .eq("password", password)
+        .eq("is_active", true)
+        .single()
 
-    // Find user based on role and email
-    if (role === "student") {
-      foundUser = MOCK_USERS.students.find((u) => u.email === email || u.id === email)
-    } else if (role === "teacher") {
-      foundUser = MOCK_USERS.teachers.find((u) => u.email === email || u.id === email)
-    } else if (role === "admin") {
-      foundUser = MOCK_USERS.admins.find((u) => u.email === email || u.id === email)
-    }
-
-    // For demo purposes, accept any password
-    if (foundUser) {
-      setUser(foundUser)
-      localStorage.setItem("avasya_user", JSON.stringify(foundUser))
-      setIsLoading(false)
-      return true
-    }
-
-    // For demo purposes, create a new user if not found
-    if (!foundUser && email && password) {
-      const newUser: User = {
-        id: `${role[0]}${Math.floor(Math.random() * 1000)}`,
-        name: email.split("@")[0],
-        email: email,
-        role: role,
-        level: 1,
-        points: 0,
-        progress: 0,
-        joinDate: new Date().toISOString().split("T")[0],
+      if (error || !userData) {
+        setIsLoading(false)
+        return false
       }
 
-      setUser(newUser)
-      localStorage.setItem("avasya_user", JSON.stringify(newUser))
+      // Set user role based on their position/specialization
+      let userRole: UserRole = "student"
+      if (
+        userData.area_of_work?.toLowerCase().includes("project manager") ||
+        userData.area_of_work?.toLowerCase().includes("co-head")
+      ) {
+        userRole = "admin"
+      } else if (userData.level >= 4 || userData.points >= 400) {
+        userRole = "teacher"
+      }
+
+      const authenticatedUser: User = {
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        roll_number: userData.roll_number,
+        role: userRole,
+        department: userData.department,
+        specialization: userData.specialization,
+        area_of_work: userData.area_of_work,
+        avatar_url: userData.avatar_url,
+        level: userData.level,
+        points: userData.points,
+        progress: userData.progress,
+        join_date: userData.join_date,
+        is_active: userData.is_active,
+      }
+
+      setUser(authenticatedUser)
+      localStorage.setItem("avasya_user", JSON.stringify(authenticatedUser))
       setIsLoading(false)
       return true
+    } catch (error) {
+      console.error("Login error:", error)
+      setIsLoading(false)
+      return false
     }
-
-    setIsLoading(false)
-    return false
   }
 
   // Logout function
