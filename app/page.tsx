@@ -318,7 +318,7 @@ export default function Home() {
               </Link>
             </motion.div>
 
-            {/* Live Stats Counter */}
+            {/* Live Stats Counter - Fixed Icon Sizes */}
             <motion.div
               className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 max-w-4xl mx-auto"
               initial={{ opacity: 0, y: 30 }}
@@ -326,10 +326,10 @@ export default function Home() {
               transition={{ duration: 1, delay: 0.9 }}
             >
               {[
-                { icon: <Atom className="h-6 w-6" />, value: "47", label: "Breakthroughs", suffix: "+" },
-                { icon: <Cpu className="h-6 w-6" />, value: "156", label: "Research Papers", suffix: "+" },
-                { icon: <Users className="h-6 w-6" />, value: "89", label: "Scientists", suffix: "" },
-                { icon: <Award className="h-6 w-6" />, value: "23", label: "Awards", suffix: "+" },
+                { icon: <Atom className="h-5 w-5" />, value: "47", label: "Breakthroughs", suffix: "+" },
+                { icon: <Cpu className="h-5 w-5" />, value: "156", label: "Research Papers", suffix: "+" },
+                { icon: <Users className="h-5 w-5" />, value: "89", label: "Scientists", suffix: "" },
+                { icon: <Award className="h-5 w-5" />, value: "23", label: "Awards", suffix: "+" },
               ].map((stat, index) => (
                 <motion.div
                   key={index}

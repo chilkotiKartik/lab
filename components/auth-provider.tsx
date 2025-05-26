@@ -2,31 +2,26 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
-import { useToast } from "@/hooks/use-toast"
 import { getSupabaseClient } from "@/lib/supabase-service"
 
-// Define user roles
-export type UserRole = "student" | "teacher" | "admin"
+export type UserRole = "admin" | "teacher" | "student"
 
-// Define user interface
 export interface User {
   id: string
   name: string
   email: string
-  roll_number?: string
   role: UserRole
+  roll_number?: string
   department?: string
   specialization?: string
   area_of_work?: string
-  avatar_url?: string
   level?: number
   points?: number
   progress?: number
-  join_date?: string
+  avatar_url?: string
   is_active?: boolean
 }
 
-// Create auth context
 interface AuthContextType {
   user: User | null
   login: (identifier: string, password: string) => Promise<boolean>
@@ -39,73 +34,94 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const { toast } = useToast()
 
-  // Check for stored user on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem("avasya_user")
-    if (storedUser) {
+    // Check for existing session
+    const savedUser = localStorage.getItem("avasya_user")
+    if (savedUser) {
       try {
-        setUser(JSON.parse(storedUser))
+        setUser(JSON.parse(savedUser))
       } catch (error) {
-        console.error("Failed to parse stored user", error)
+        console.error("Error parsing saved user:", error)
         localStorage.removeItem("avasya_user")
       }
     }
     setIsLoading(false)
   }, [])
 
-  // Login function with real database integration
   const login = async (identifier: string, password: string): Promise<boolean> => {
-    setIsLoading(true)
-
     try {
+      setIsLoading(true)
+
+      // Check for admin login
+      if (identifier === "admin@kar" && password === "99976") {
+        const adminUser: User = {
+          id: "admin-001",
+          name: "AVASYA Administrator",
+          email: "admin@kar",
+          role: "admin",
+          level: 10,
+          points: 9999,
+          progress: 100,
+          is_active: true,
+        }
+
+        setUser(adminUser)
+        localStorage.setItem("avasya_user", JSON.stringify(adminUser))
+        setIsLoading(false)
+        return true
+      }
+
+      // Regular user login
       const supabase = getSupabaseClient()
 
       // Try to find user by email or roll number
-      const { data: userData, error } = await supabase
+      const { data: users, error } = await supabase
         .from("users")
         .select("*")
         .or(`email.eq.${identifier},roll_number.eq.${identifier}`)
-        .eq("password", password)
         .eq("is_active", true)
-        .single()
+        .limit(1)
 
-      if (error || !userData) {
+      if (error) {
+        console.error("Login error:", error)
         setIsLoading(false)
         return false
       }
 
-      // Set user role based on their position/specialization
-      let userRole: UserRole = "student"
-      if (
-        userData.area_of_work?.toLowerCase().includes("project manager") ||
-        userData.area_of_work?.toLowerCase().includes("co-head")
-      ) {
-        userRole = "admin"
-      } else if (userData.level >= 4 || userData.points >= 400) {
-        userRole = "teacher"
+      if (!users || users.length === 0) {
+        setIsLoading(false)
+        return false
       }
 
-      const authenticatedUser: User = {
+      const userData = users[0]
+
+      // Check password (last 4 digits of roll number)
+      const expectedPassword = userData.roll_number?.slice(-4) || "0000"
+      if (password !== expectedPassword) {
+        setIsLoading(false)
+        return false
+      }
+
+      // Create user object
+      const loggedInUser: User = {
         id: userData.id,
         name: userData.name,
         email: userData.email,
+        role: userData.role || "student",
         roll_number: userData.roll_number,
-        role: userRole,
         department: userData.department,
         specialization: userData.specialization,
         area_of_work: userData.area_of_work,
+        level: userData.level || 1,
+        points: userData.points || 0,
+        progress: userData.progress || 0,
         avatar_url: userData.avatar_url,
-        level: userData.level,
-        points: userData.points,
-        progress: userData.progress,
-        join_date: userData.join_date,
         is_active: userData.is_active,
       }
 
-      setUser(authenticatedUser)
-      localStorage.setItem("avasya_user", JSON.stringify(authenticatedUser))
+      setUser(loggedInUser)
+      localStorage.setItem("avasya_user", JSON.stringify(loggedInUser))
       setIsLoading(false)
       return true
     } catch (error) {
@@ -115,20 +131,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // Logout function
   const logout = () => {
     setUser(null)
     localStorage.removeItem("avasya_user")
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    })
   }
 
   return <AuthContext.Provider value={{ user, login, logout, isLoading }}>{children}</AuthContext.Provider>
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider")

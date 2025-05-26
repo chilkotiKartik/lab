@@ -9,7 +9,7 @@ import Footer from "@/components/footer"
 import { PageTransition } from "@/components/page-transition"
 import { AchievementsNotification } from "@/components/achievements-notification"
 import { WelcomeAnimation } from "@/components/welcome-animation"
-import { ChatSystem } from "@/components/chat-system"
+import { EnhancedChatSystem } from "@/components/enhanced-chat-system"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -38,7 +38,7 @@ export default function RootLayout({
               <Footer />
             </div>
             <AchievementsNotification />
-            <ChatSystem />
+            <EnhancedChatSystem />
           </AuthProvider>
         </ThemeProvider>
       </body>
