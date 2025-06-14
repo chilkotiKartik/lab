@@ -9,22 +9,6 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-} from "recharts"
-import {
   Users,
   FileText,
   TrendingUp,
@@ -51,49 +35,13 @@ export default function AdminDashboardPage() {
     totalRevenue: 0,
   })
 
-  // Mock data for charts
-  const userGrowthData = [
-    { month: "Jan", users: 120, projects: 15 },
-    { month: "Feb", users: 180, projects: 22 },
-    { month: "Mar", users: 250, projects: 35 },
-    { month: "Apr", users: 320, projects: 48 },
-    { month: "May", users: 420, projects: 62 },
-    { month: "Jun", users: 520, projects: 78 },
-  ]
-
-  const projectCategoryData = [
-    { name: "AI/ML", value: 35, color: "#3b82f6" },
-    { name: "Web Dev", value: 25, color: "#8b5cf6" },
-    { name: "Mobile", value: 20, color: "#ec4899" },
-    { name: "IoT", value: 15, color: "#10b981" },
-    { name: "Other", value: 5, color: "#6b7280" },
-  ]
-
-  const revenueData = [
-    { month: "Jan", revenue: 12000, expenses: 8000 },
-    { month: "Feb", revenue: 15000, expenses: 9000 },
-    { month: "Mar", revenue: 18000, expenses: 10000 },
-    { month: "Apr", revenue: 22000, expenses: 11000 },
-    { month: "May", revenue: 28000, expenses: 12000 },
-    { month: "Jun", revenue: 35000, expenses: 13000 },
-  ]
-
-  const activityData = [
-    { time: "00:00", users: 45 },
-    { time: "04:00", users: 25 },
-    { time: "08:00", users: 120 },
-    { time: "12:00", users: 180 },
-    { time: "16:00", users: 220 },
-    { time: "20:00", users: 150 },
-  ]
-
   // Recent activities
   const recentActivities = [
     {
       id: 1,
       type: "project_submitted",
       user: "Alex Chen",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
+      avatar: "/images/student-1.png",
       action: "submitted a new project",
       target: "AI Music Composer",
       timestamp: "2 minutes ago",
@@ -103,7 +51,7 @@ export default function AdminDashboardPage() {
       id: 2,
       type: "user_registered",
       user: "Maya Patel",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?q=80&w=150&auto=format&fit=crop",
+      avatar: "/images/student-2.png",
       action: "joined the platform",
       target: "",
       timestamp: "15 minutes ago",
@@ -113,21 +61,11 @@ export default function AdminDashboardPage() {
       id: 3,
       type: "project_approved",
       user: "Admin",
-      avatar: "/placeholder.svg",
+      avatar: "/images/admin-1.png",
       action: "approved project",
       target: "Fashion Trend Predictor",
       timestamp: "1 hour ago",
       status: "success",
-    },
-    {
-      id: 4,
-      type: "review_submitted",
-      user: "Dr. Sarah Kim",
-      avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=150&auto=format&fit=crop",
-      action: "submitted a review for",
-      target: "Mental Health AI",
-      timestamp: "2 hours ago",
-      status: "info",
     },
   ]
 
@@ -137,7 +75,7 @@ export default function AdminDashboardPage() {
       id: 1,
       title: "Quantum Navigation System",
       author: "Dr. Elena Vasquez",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?q=80&w=150&auto=format&fit=crop",
+      avatar: "/images/teacher-1.png",
       category: "Quantum Computing",
       submittedDate: "2024-01-15",
       priority: "high",
@@ -147,20 +85,10 @@ export default function AdminDashboardPage() {
       id: 2,
       title: "Blockchain Voting Platform",
       author: "Michael Zhang",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
+      avatar: "/images/student-3.png",
       category: "Blockchain",
       submittedDate: "2024-01-14",
       priority: "medium",
-      status: "pending",
-    },
-    {
-      id: 3,
-      title: "Smart Home IoT System",
-      author: "Lisa Chen",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop",
-      category: "IoT",
-      submittedDate: "2024-01-13",
-      priority: "low",
       status: "pending",
     },
   ]
@@ -170,7 +98,7 @@ export default function AdminDashboardPage() {
     {
       id: 1,
       name: "Alex Chen",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
+      avatar: "/images/student-1.png",
       role: "AI Engineer",
       projects: 12,
       contributions: 847,
@@ -179,25 +107,15 @@ export default function AdminDashboardPage() {
     {
       id: 2,
       name: "Maya Patel",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?q=80&w=150&auto=format&fit=crop",
+      avatar: "/images/student-2.png",
       role: "Music Producer",
       projects: 8,
       contributions: 623,
       rating: 4.8,
     },
-    {
-      id: 3,
-      name: "Sophie Williams",
-      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=150&auto=format&fit=crop",
-      role: "Fashion Designer",
-      projects: 6,
-      contributions: 445,
-      rating: 4.7,
-    },
   ]
 
   useEffect(() => {
-    // Simulate loading data
     const timer = setTimeout(() => {
       setStats({
         totalUsers: 1247,
@@ -353,358 +271,231 @@ export default function AdminDashboardPage() {
           </motion.div>
         </div>
 
-        {/* Charts and Analytics */}
+        {/* Main Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
-            <TabsTrigger value="revenue">Revenue</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
-              {/* User Growth Chart */}
+              {/* Recent Activities */}
               <Card className="bg-card/50 backdrop-blur-sm border-border">
                 <CardHeader>
-                  <CardTitle>User Growth</CardTitle>
-                  <CardDescription>Monthly user registration and project creation trends</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={userGrowthData}>
-                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "hsl(var(--card))",
-                            borderColor: "hsl(var(--border))",
-                            borderRadius: "var(--radius)",
-                          }}
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="users"
-                          stackId="1"
-                          stroke="hsl(var(--primary))"
-                          fill="hsl(var(--primary))"
-                          fillOpacity={0.6}
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="projects"
-                          stackId="2"
-                          stroke="hsl(var(--secondary))"
-                          fill="hsl(var(--secondary))"
-                          fillOpacity={0.6}
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Project Categories */}
-              <Card className="bg-card/50 backdrop-blur-sm border-border">
-                <CardHeader>
-                  <CardTitle>Project Categories</CardTitle>
-                  <CardDescription>Distribution of projects by category</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] flex items-center justify-center">
-                    <ResponsiveContainer width="100">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={projectCategoryData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            outerRadius={100}
-                            fill="#8884d8"
-                            dataKey="value"
-                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          >
-                            {projectCategoryData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "hsl(var(--card))",
-                              borderColor: "hsl(var(--border))",
-                              borderRadius: "var(--radius)",
-                            }}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Activity Timeline */}
-              <Card className="bg-card/50 backdrop-blur-sm border-border">
-                <CardHeader>
-                  <CardTitle>Real-time Activity</CardTitle>
-                  <CardDescription>User activity throughout the day</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={activityData}>
-                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                        <XAxis dataKey="time" />
-                        <YAxis />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "hsl(var(--card))",
-                            borderColor: "hsl(var(--border))",
-                            borderRadius: "var(--radius)",
-                          }}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="users"
-                          stroke="hsl(var(--primary))"
-                          strokeWidth={3}
-                          dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 4 }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="users" className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* Top Performers */}
-                <Card className="bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader>
-                    <CardTitle>Top Performers</CardTitle>
-                    <CardDescription>Most active community members</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {topPerformers.map((performer, index) => (
-                        <div key={performer.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
-                          <div className="flex items-center gap-3">
-                            <div className="text-lg font-bold text-primary">#{index + 1}</div>
-                            <div className="w-10 h-10 rounded-full overflow-hidden">
-                              <Image
-                                src={performer.avatar || "/placeholder.svg"}
-                                alt={performer.name}
-                                width={40}
-                                height={40}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-medium">{performer.name}</h4>
-                            <p className="text-sm text-muted-foreground">{performer.role}</p>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-sm font-medium">{performer.projects} projects</div>
-                            <div className="text-xs text-muted-foreground">{performer.contributions} contributions</div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Award className="h-4 w-4 text-yellow-500" />
-                            <span className="text-sm font-medium">{performer.rating}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Recent Activities */}
-                <Card className="bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader>
-                    <CardTitle>Recent Activities</CardTitle>
-                    <CardDescription>Latest platform activities</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {recentActivities.map((activity) => (
-                        <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
-                          <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                            <Image
-                              src={activity.avatar || "/placeholder.svg"}
-                              alt={activity.user}
-                              width={32}
-                              height={32}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm">
-                              <span className="font-medium">{activity.user}</span>{" "}
-                              <span className="text-muted-foreground">{activity.action}</span>{" "}
-                              {activity.target && <span className="font-medium">{activity.target}</span>}
-                            </p>
-                            <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
-                          </div>
-                          <Badge
-                            variant={
-                              activity.status === "success"
-                                ? "default"
-                                : activity.status === "pending"
-                                  ? "secondary"
-                                  : "outline"
-                            }
-                            className="text-xs"
-                          >
-                            {activity.status}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="projects" className="space-y-6">
-              {/* Pending Reviews */}
-              <Card className="bg-card/50 backdrop-blur-sm border-border">
-                <CardHeader>
-                  <CardTitle>Pending Project Reviews</CardTitle>
-                  <CardDescription>Projects waiting for admin approval</CardDescription>
+                  <CardTitle>Recent Activities</CardTitle>
+                  <CardDescription>Latest platform activities</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {pendingReviews.map((review) => (
-                      <div key={review.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-full overflow-hidden">
+                    {recentActivities.map((activity) => (
+                      <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
+                        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                          <Image
+                            src={activity.avatar || "/placeholder.svg"}
+                            alt={activity.user}
+                            width={32}
+                            height={32}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm">
+                            <span className="font-medium">{activity.user}</span>{" "}
+                            <span className="text-muted-foreground">{activity.action}</span>{" "}
+                            {activity.target && <span className="font-medium">{activity.target}</span>}
+                          </p>
+                          <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
+                        </div>
+                        <Badge
+                          variant={
+                            activity.status === "success"
+                              ? "default"
+                              : activity.status === "pending"
+                                ? "secondary"
+                                : "outline"
+                          }
+                          className="text-xs"
+                        >
+                          {activity.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Top Performers */}
+              <Card className="bg-card/50 backdrop-blur-sm border-border">
+                <CardHeader>
+                  <CardTitle>Top Performers</CardTitle>
+                  <CardDescription>Most active community members</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {topPerformers.map((performer, index) => (
+                      <div key={performer.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
+                        <div className="flex items-center gap-3">
+                          <div className="text-lg font-bold text-primary">#{index + 1}</div>
+                          <div className="w-10 h-10 rounded-full overflow-hidden">
                             <Image
-                              src={review.avatar || "/placeholder.svg"}
-                              alt={review.author}
-                              width={48}
-                              height={48}
+                              src={performer.avatar || "/placeholder.svg"}
+                              alt={performer.name}
+                              width={40}
+                              height={40}
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          <div>
-                            <h4 className="font-medium">{review.title}</h4>
-                            <p className="text-sm text-muted-foreground">by {review.author}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="outline" className="text-xs">
-                                {review.category}
-                              </Badge>
-                              <Badge
-                                variant={
-                                  review.priority === "high"
-                                    ? "destructive"
-                                    : review.priority === "medium"
-                                      ? "secondary"
-                                      : "outline"
-                                }
-                                className="text-xs"
-                              >
-                                {review.priority} priority
-                              </Badge>
-                            </div>
-                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleRejectProject(review.id)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <XCircle className="h-4 w-4 mr-1" />
-                            Reject
-                          </Button>
-                          <Button size="sm" onClick={() => handleApproveProject(review.id)}>
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            Approve
-                          </Button>
-                          <Link href={`/admin/reviews/projects/${review.id}`}>
-                            <Button size="sm" variant="ghost">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
+                        <div className="flex-1">
+                          <h4 className="font-medium">{performer.name}</h4>
+                          <p className="text-sm text-muted-foreground">{performer.role}</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium">{performer.projects} projects</div>
+                          <div className="text-xs text-muted-foreground">{performer.contributions} contributions</div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Award className="h-4 w-4 text-yellow-500" />
+                          <span className="text-sm font-medium">{performer.rating}</span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
+            </div>
+          </TabsContent>
 
-            <TabsContent value="revenue" className="space-y-6">
-              {/* Revenue Chart */}
-              <Card className="bg-card/50 backdrop-blur-sm border-border">
-                <CardHeader>
-                  <CardTitle>Revenue vs Expenses</CardTitle>
-                  <CardDescription>Monthly financial overview</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[400px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={revenueData}>
-                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "hsl(var(--card))",
-                            borderColor: "hsl(var(--border))",
-                            borderRadius: "var(--radius)",
-                          }}
-                        />
-                        <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Revenue" />
-                        <Bar dataKey="expenses" fill="hsl(var(--secondary))" name="Expenses" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          <TabsContent value="users" className="space-y-6">
+            <Card className="bg-card/50 backdrop-blur-sm border-border">
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>Manage platform users and permissions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">User Management</h3>
+                  <p className="text-muted-foreground mb-4">View and manage all platform users</p>
+                  <Button asChild>
+                    <Link href="/admin/users">Go to User Management</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-          {/* Quick Actions */}
-          <Card className="bg-card/50 backdrop-blur-sm border-border">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Common administrative tasks</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Link href="/admin/users">
-                  <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                    <Users className="h-6 w-6" />
-                    <span className="text-sm">Manage Users</span>
-                  </Button>
-                </Link>
-                <Link href="/admin/reviews/projects">
-                  <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                    <FileText className="h-6 w-6" />
-                    <span className="text-sm">Review Projects</span>
-                  </Button>
-                </Link>
-                <Link href="/admin/analytics">
-                  <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                    <TrendingUp className="h-6 w-6" />
-                    <span className="text-sm">View Analytics</span>
-                  </Button>
-                </Link>
-                <Link href="/admin/settings">
-                  <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                    <Activity className="h-6 w-6" />
-                    <span className="text-sm">System Settings</span>
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </AdminLayout>
-    );
-  }
+          <TabsContent value="projects" className="space-y-6">
+            <Card className="bg-card/50 backdrop-blur-sm border-border">
+              <CardHeader>
+                <CardTitle>Pending Project Reviews</CardTitle>
+                <CardDescription>Projects waiting for admin approval</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {pendingReviews.map((review) => (
+                    <div
+                      key={review.id}
+                      className="flex items-center justify-between p-4 border border-border rounded-lg"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full overflow-hidden">
+                          <Image
+                            src={review.avatar || "/placeholder.svg"}
+                            alt={review.author}
+                            width={48}
+                            height={48}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <h4 className="font-medium">{review.title}</h4>
+                          <p className="text-sm text-muted-foreground">by {review.author}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {review.category}
+                            </Badge>
+                            <Badge
+                              variant={
+                                review.priority === "high"
+                                  ? "destructive"
+                                  : review.priority === "medium"
+                                    ? "secondary"
+                                    : "outline"
+                              }
+                              className="text-xs"
+                            >
+                              {review.priority} priority
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleRejectProject(review.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <XCircle className="h-4 w-4 mr-1" />
+                          Reject
+                        </Button>
+                        <Button size="sm" onClick={() => handleApproveProject(review.id)}>
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Approve
+                        </Button>
+                        <Link href={`/admin/reviews/projects/${review.id}`}>
+                          <Button size="sm" variant="ghost">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Quick Actions */}
+        <Card className="bg-card/50 backdrop-blur-sm border-border">
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Common administrative tasks</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Link href="/admin/users">
+                <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
+                  <Users className="h-6 w-6" />
+                  <span className="text-sm">Manage Users</span>
+                </Button>
+              </Link>
+              <Link href="/admin/reviews/projects">
+                <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
+                  <FileText className="h-6 w-6" />
+                  <span className="text-sm">Review Projects</span>
+                </Button>
+              </Link>
+              <Link href="/admin/analytics">
+                <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
+                  <TrendingUp className="h-6 w-6" />
+                  <span className="text-sm">View Analytics</span>
+                </Button>
+              </Link>
+              <Link href="/admin/settings">
+                <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
+                  <Activity className="h-6 w-6" />
+                  <span className="text-sm">System Settings</span>
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </AdminLayout>
+  )
+}
