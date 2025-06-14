@@ -5,37 +5,19 @@ import type React from "react"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import Image from "next/image"
+import { Github, Twitter, Linkedin, Mail, Rocket, Satellite, DrillIcon as Drone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
-import {
-  Github,
-  Twitter,
-  Linkedin,
-  Mail,
-  Phone,
-  MapPin,
-  Send,
-  Heart,
-  Sparkles,
-  Rocket,
-  Users,
-  Code,
-  Palette,
-  Brain,
-  Globe,
-  ArrowUp,
-} from "lucide-react"
+import Logo from "@/components/logo"
 
 export default function Footer() {
   const { toast } = useToast()
   const [email, setEmail] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isNewsletterSubmitting, setIsNewsletterSubmitting] = useState(false)
   const currentYear = new Date().getFullYear()
 
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) {
       toast({
@@ -46,305 +28,235 @@ export default function Footer() {
       return
     }
 
-    setIsSubmitting(true)
+    setIsNewsletterSubmitting(true)
 
     // Simulate API call
     setTimeout(() => {
       toast({
-        title: "Welcome to Infinity! 🚀",
-        description: "You've successfully subscribed to our newsletter!",
+        title: "Subscription Successful",
+        description: "Thank you for subscribing to our newsletter!",
       })
       setEmail("")
-      setIsSubmitting(false)
+      setIsNewsletterSubmitting(false)
     }, 1500)
   }
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" })
+  const footerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
   }
 
-  const footerSections = [
-    {
-      title: "Platform",
-      links: [
-        { name: "Projects", href: "/projects", icon: <Code className="h-4 w-4" /> },
-        { name: "Research", href: "/research", icon: <Brain className="h-4 w-4" /> },
-        { name: "3D Gallery", href: "/gallery", icon: <Palette className="h-4 w-4" /> },
-        { name: "Team", href: "/team", icon: <Users className="h-4 w-4" /> },
-      ],
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5 },
     },
-    {
-      title: "Community",
-      links: [
-        { name: "Join Us", href: "/signup", icon: <Rocket className="h-4 w-4" /> },
-        { name: "About", href: "/about", icon: <Globe className="h-4 w-4" /> },
-        { name: "Contact", href: "/contact", icon: <Mail className="h-4 w-4" /> },
-        { name: "Support", href: "/support", icon: <Heart className="h-4 w-4" /> },
-      ],
-    },
-    {
-      title: "Resources",
-      links: [
-        { name: "Documentation", href: "/docs", icon: <Code className="h-4 w-4" /> },
-        { name: "API", href: "/api", icon: <Code className="h-4 w-4" /> },
-        { name: "Blog", href: "/blog", icon: <Globe className="h-4 w-4" /> },
-        { name: "Help Center", href: "/help", icon: <Heart className="h-4 w-4" /> },
-      ],
-    },
-  ]
+  }
 
-  const socialLinks = [
-    { name: "GitHub", href: "https://github.com/infinitytech", icon: <Github className="h-5 w-5" /> },
-    { name: "Twitter", href: "https://twitter.com/infinitytech", icon: <Twitter className="h-5 w-5" /> },
-    { name: "LinkedIn", href: "https://linkedin.com/company/infinitytech", icon: <Linkedin className="h-5 w-5" /> },
-    { name: "Email", href: "mailto:hello@infinitytech.com", icon: <Mail className="h-5 w-5" /> },
-  ]
-
-  const recentProjects = [
+  // Recent news items
+  const recentNews = [
     {
-      title: "AI Music Composer",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=100&auto=format&fit=crop",
-      href: "/projects/music-ai",
+      title: "Avasya Unveils Breakthrough in Quantum Navigation",
+      date: "June 15, 2023",
+      link: "#",
     },
     {
-      title: "Fashion Trend Predictor",
-      image: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=100&auto=format&fit=crop",
-      href: "/projects/fashion-ai",
+      title: "New Partnership with Global Space Agency Announced",
+      date: "May 22, 2023",
+      link: "#",
     },
     {
-      title: "Mental Health AI",
-      image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?q=80&w=100&auto=format&fit=crop",
-      href: "/projects/mental-health",
+      title: "Biomimetic Drone Research Featured in Science Journal",
+      date: "April 8, 2023",
+      link: "#",
     },
   ]
 
   return (
-    <footer className="relative bg-background border-t border-border">
+    <footer className="bg-muted/30 border-t border-border relative overflow-hidden">
+      <div className="absolute inset-0 space-dots opacity-30 pointer-events-none"></div>
+
       {/* Newsletter Section */}
-      <div className="relative py-16 bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM5QzkyQUMiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIxIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="max-w-4xl mx-auto text-center"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-6 py-2 mb-6">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Stay Updated</span>
+      <div className="container mx-auto px-4 py-12 border-b border-border">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <h3 className="text-xl font-bold font-space mb-2">Subscribe to Our Newsletter</h3>
+              <p className="text-muted-foreground">Stay updated with our latest research and discoveries.</p>
             </div>
-
-            <h2 className="text-3xl md:text-4xl font-bold font-space mb-4">
-              Join Our{" "}
-              <span className="bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
-                Community
-              </span>
-            </h2>
-            <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
-              Get the latest updates on innovative projects, exclusive content, and be the first to know about new
-              features.
-            </p>
-
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-              <div className="relative flex-1">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  type="email"
-                  placeholder="Enter your email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 h-12"
-                  required
-                />
-              </div>
-              <Button type="submit" disabled={isSubmitting} className="h-12 px-8">
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Subscribing...
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Send className="h-4 w-4" />
-                    Subscribe
-                  </div>
-                )}
+            <form onSubmit={handleNewsletterSubmit} className="flex w-full max-w-sm gap-2">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1"
+              />
+              <Button type="submit" disabled={isNewsletterSubmitting}>
+                {isNewsletterSubmitting ? "..." : "Subscribe"}
               </Button>
             </form>
-
-            <p className="text-xs text-muted-foreground mt-4">
-              Join 50,000+ innovators already part of our community. Unsubscribe anytime.
-            </p>
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      {/* Main Footer Content */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
-          {/* Brand Section */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center space-x-3 mb-6">
-              <div className="relative">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Sparkles className="h-7 w-7 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-pulse" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold font-space bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                  Infinity
-                </h3>
-                <p className="text-sm text-muted-foreground -mt-1">Tech Society</p>
-              </div>
-            </Link>
-
-            <p className="text-muted-foreground mb-6 leading-relaxed">
-              Empowering innovators and creators to build the future through collaborative technology projects. Join our
-              community of passionate developers, designers, and researchers.
+      {/* Main Footer */}
+      <div className="container mx-auto px-4 py-12">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-4 gap-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={footerVariants}
+        >
+          <motion.div variants={itemVariants} className="col-span-1 md:col-span-1">
+            <div className="flex items-center space-x-2 mb-4">
+              <Logo size={32} />
+              <span className="font-space font-bold text-xl glow-text">
+                Avasya<span className="cosmic-gradient">Lab</span>
+              </span>
+            </div>
+            <p className="text-muted-foreground text-sm mb-4">
+              Pioneering the future of aerospace technology and space innovation through cutting-edge research and
+              development.
             </p>
+            <div className="flex space-x-4">
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Twitter size={18} />
+                <span className="sr-only">Twitter</span>
+              </Link>
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Github size={18} />
+                <span className="sr-only">GitHub</span>
+              </Link>
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Linkedin size={18} />
+                <span className="sr-only">LinkedIn</span>
+              </Link>
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Mail size={18} />
+                <span className="sr-only">Email</span>
+              </Link>
+            </div>
+          </motion.div>
 
-            {/* Social Links */}
-            <div className="flex items-center gap-3 mb-6">
-              {socialLinks.map((social) => (
-                <Link
-                  key={social.name}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg bg-muted/50 hover:bg-primary hover:text-primary-foreground transition-all duration-300 group"
-                >
-                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                    {social.icon}
-                  </motion.div>
-                  <span className="sr-only">{social.name}</span>
+          <motion.div variants={itemVariants} className="col-span-1">
+            <h3 className="font-space font-medium text-lg mb-4">Navigation</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  Home
                 </Link>
+              </li>
+              <li>
+                <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/team" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  Mission Minds
+                </Link>
+              </li>
+              <li>
+                <Link href="/research" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  Research Hub
+                </Link>
+              </li>
+              <li>
+                <Link href="/projects" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  Projects
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="col-span-1">
+            <h3 className="font-space font-medium text-lg mb-4">Research Areas</h3>
+            <ul className="space-y-2">
+              <li className="flex items-center space-x-2">
+                <Drone size={14} className="text-primary" />
+                <Link
+                  href="/research?category=drones"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
+                  Drone Technology
+                </Link>
+              </li>
+              <li className="flex items-center space-x-2">
+                <Rocket size={14} className="text-primary" />
+                <Link
+                  href="/research?category=spacecraft"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
+                  Spacecraft Design
+                </Link>
+              </li>
+              <li className="flex items-center space-x-2">
+                <Satellite size={14} className="text-primary" />
+                <Link
+                  href="/research?category=satellite"
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
+                  Satellite Systems
+                </Link>
+              </li>
+            </ul>
+
+            <h3 className="font-space font-medium text-lg mt-6 mb-4">Recent News</h3>
+            <ul className="space-y-3">
+              {recentNews.map((news, index) => (
+                <li key={index}>
+                  <Link href={news.link} className="group">
+                    <p className="text-sm font-medium group-hover:text-primary transition-colors">{news.title}</p>
+                    <p className="text-xs text-muted-foreground">{news.date}</p>
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
+          </motion.div>
 
-            {/* Contact Info */}
-            <div className="space-y-3 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-primary" />
-                <span>San Francisco, CA & Remote</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-primary" />
-                <Link href="mailto:hello@infinitytech.com" className="hover:text-primary transition-colors">
-                  hello@infinitytech.com
-                </Link>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-primary" />
-                <Link href="tel:+1234567890" className="hover:text-primary transition-colors">
+          <motion.div variants={itemVariants} className="col-span-1">
+            <h3 className="font-space font-medium text-lg mb-4">Contact Us</h3>
+            <address className="not-italic text-muted-foreground text-sm space-y-2">
+              <p>Avasya Research Lab</p>
+              <p>123 Cosmic Avenue</p>
+              <p>Stellar City, SC 12345</p>
+              <p className="mt-2">
+                <a href="mailto:info@avasya-lab.com" className="hover:text-primary transition-colors">
+                  info@avasya-lab.com
+                </a>
+              </p>
+              <p>
+                <a href="tel:+1234567890" className="hover:text-primary transition-colors">
                   +1 (234) 567-890
-                </Link>
-              </div>
-            </div>
-          </div>
+                </a>
+              </p>
+            </address>
+          </motion.div>
+        </motion.div>
 
-          {/* Navigation Sections */}
-          {footerSections.map((section, index) => (
-            <motion.div
-              key={section.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-            >
-              <h4 className="font-semibold text-lg mb-4 flex items-center gap-2">{section.title}</h4>
-              <ul className="space-y-3">
-                {section.links.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      href={link.href}
-                      className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group"
-                    >
-                      <span className="group-hover:translate-x-1 transition-transform duration-200">{link.icon}</span>
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
-        </div>
-
-        <Separator className="my-12" />
-
-        {/* Recent Projects */}
-        <div className="mb-12">
-          <h4 className="font-semibold text-lg mb-6 text-center">Featured Projects</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto">
-            {recentProjects.map((project, index) => (
-              <motion.div
-                key={project.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
-                <Link
-                  href={project.href}
-                  className="group block bg-muted/30 rounded-xl p-4 hover:bg-muted/50 transition-all duration-300"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                      <Image
-                        src={project.image || "/placeholder.svg"}
-                        alt={project.title}
-                        width={48}
-                        height={48}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    </div>
-                    <div>
-                      <h5 className="font-medium group-hover:text-primary transition-colors">{project.title}</h5>
-                      <p className="text-xs text-muted-foreground">View Project</p>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        <Separator className="mb-8" />
-
-        {/* Bottom Section */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex flex-col md:flex-row items-center gap-4 text-sm text-muted-foreground">
-            <p>&copy; {currentYear} Infinity Tech Society. All rights reserved.</p>
-            <div className="flex items-center gap-4">
-              <Link href="/privacy" className="hover:text-primary transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="hover:text-primary transition-colors">
-                Terms of Service
-              </Link>
-              <Link href="/cookies" className="hover:text-primary transition-colors">
-                Cookie Policy
-              </Link>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
-              Made with <Heart className="h-4 w-4 text-red-500 fill-current" /> by Infinity Team
-            </p>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={scrollToTop}
-              className="rounded-full bg-primary/10 hover:bg-primary hover:text-primary-foreground"
-            >
-              <ArrowUp className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="border-t border-border mt-8 pt-8 text-center text-muted-foreground text-sm"
+        >
+          <p>&copy; {currentYear} Avasya Research Lab. All rights reserved.</p>
+        </motion.div>
       </div>
     </footer>
   )
