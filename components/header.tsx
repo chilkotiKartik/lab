@@ -1,14 +1,17 @@
 "use client"
+
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter, usePathname } from "next/navigation"
-import { motion } from "framer-motion"
-import { useAuth } from "@/components/auth-provider"
-import { NotificationSystem } from "@/components/notification-system"
-import { UserAvatar } from "@/components/user-avatar"
-import ThemeToggle from "@/components/theme-toggle"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,304 +20,226 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Badge } from "@/components/ui/badge"
+import { ThemeToggle } from "@/components/theme-toggle"
 import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, Rocket, Users, FileText, Settings, LogOut, User, BarChart3, Award, Sparkles } from "lucide-react"
+  Menu,
+  Bell,
+  Search,
+  User,
+  Settings,
+  LogOut,
+  Home,
+  Users,
+  BookOpen,
+  Briefcase,
+  MessageSquare,
+  Award,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 
+const navigation = [
+  { name: "Home", href: "/", icon: Home },
+  { name: "About", href: "/about", icon: Users },
+  { name: "Projects", href: "/projects", icon: Briefcase },
+  { name: "Research", href: "/research", icon: BookOpen },
+  { name: "Gallery", href: "/gallery", icon: Award },
+  { name: "Team", href: "/team", icon: Users },
+  { name: "Contact", href: "/contact", icon: MessageSquare },
+]
+
+const userNavigation = [
+  { name: "Dashboard", href: "/dashboard", icon: Home },
+  { name: "Profile", href: "/dashboard/settings", icon: User },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+]
+
 export default function Header() {
-  const router = useRouter()
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(true) // Mock authentication state
+  const [notifications] = useState(3) // Mock notifications
   const pathname = usePathname()
-  const { user, logout } = useAuth()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
+      setIsScrolled(window.scrollY > 10)
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleLogout = () => {
-    logout()
-    router.push("/")
-    setMobileMenuOpen(false)
-  }
-
-  const navigationItems = [
-    {
-      title: "Research",
-      href: "/research",
-      description: "Explore our groundbreaking research projects",
-      icon: <FileText className="h-4 w-4" />,
-    },
-    {
-      title: "Projects",
-      href: "/projects",
-      description: "View active aerospace projects",
-      icon: <Rocket className="h-4 w-4" />,
-    },
-    {
-      title: "3D Gallery",
-      href: "/gallery",
-      description: "Interactive 3D model showcase",
-      icon: <Sparkles className="h-4 w-4" />,
-    },
-    {
-      title: "Team",
-      href: "/team",
-      description: "Meet our research team",
-      icon: <Users className="h-4 w-4" />,
-    },
-    {
-      title: "About",
-      href: "/about",
-      description: "Learn about AVASYA Research Lab",
-      icon: <Award className="h-4 w-4" />,
-    },
-  ]
-
-  const getDashboardLink = () => {
-    if (!user) return "/login"
-
-    switch (user.role) {
-      case "admin":
-        return "/instructor/dashboard"
-      case "teacher":
-        return "/teacher/dashboard"
-      default:
-        return "/student/dashboard"
+  const isActive = (href: string) => {
+    if (href === "/") {
+      return pathname === href
     }
-  }
-
-  const getDashboardLabel = () => {
-    if (!user) return "Login"
-
-    switch (user.role) {
-      case "admin":
-        return "Admin Panel"
-      case "teacher":
-        return "Teacher Dashboard"
-      default:
-        return "Student Dashboard"
-    }
+    return pathname.startsWith(href)
   }
 
   return (
-    <motion.header
+    <header
       className={cn(
         "sticky top-0 z-50 w-full border-b transition-all duration-300",
-        scrolled
-          ? "bg-background/80 backdrop-blur-md border-border shadow-lg"
-          : "bg-background/60 backdrop-blur-sm border-transparent",
+        isScrolled ? "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" : "bg-background",
       )}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6 }}
     >
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <motion.div className="flex items-center space-x-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="relative">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-                  <Rocket className="h-5 w-5 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-              </div>
-              <span className="font-bold text-xl bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                AVASYA
-              </span>
-            </Link>
-          </motion.div>
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">IT</span>
+            </div>
+            <span className="hidden font-bold sm:inline-block">Infinity Tech Society</span>
+          </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            <NavigationMenu>
-              <NavigationMenuList>
-                {navigationItems.map((item) => (
-                  <NavigationMenuItem key={item.href}>
-                    <Link href={item.href} legacyBehavior passHref>
-                      <NavigationMenuLink
-                        className={cn(
-                          "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50",
-                          pathname === item.href && "bg-accent text-accent-foreground",
-                        )}
-                      >
-                        {item.icon}
-                        <span className="ml-2">{item.title}</span>
-                      </NavigationMenuLink>
-                    </Link>
-                  </NavigationMenuItem>
-                ))}
-              </NavigationMenuList>
-            </NavigationMenu>
-          </div>
+          <NavigationMenu className="hidden lg:flex">
+            <NavigationMenuList>
+              {navigation.map((item) => (
+                <NavigationMenuItem key={item.name}>
+                  <Link href={item.href} legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={cn(
+                        "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50",
+                        isActive(item.href) && "bg-accent text-accent-foreground",
+                      )}
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.name}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-3">
-            {/* Notifications */}
-            {user && <NotificationSystem />}
+          <div className="flex items-center space-x-2">
+            {/* Search Button */}
+            <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <Search className="h-4 w-4" />
+            </Button>
 
             {/* Theme Toggle */}
             <ThemeToggle />
 
-            {/* User Menu or Login */}
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <UserAvatar name={user.name} role={user.role} size="sm" showOnlineStatus={true} isOnline={true} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.name}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="outline" className="text-xs">
-                          {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                        </Badge>
-                        {user.level && (
-                          <Badge variant="secondary" className="text-xs">
-                            Level {user.level}
-                          </Badge>
-                        )}
+            {isLoggedIn ? (
+              <>
+                {/* Notifications */}
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="h-4 w-4" />
+                  {notifications > 0 && (
+                    <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                      {notifications}
+                    </Badge>
+                  )}
+                </Button>
+
+                {/* User Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="/images/student-1.png" alt="User" />
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">John Doe</p>
+                        <p className="text-xs leading-none text-muted-foreground">john.doe@example.com</p>
                       </div>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href={getDashboardLink()} className="cursor-pointer">
-                      <BarChart3 className="mr-2 h-4 w-4" />
-                      <span>{getDashboardLabel()}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings" className="cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {userNavigation.map((item) => (
+                      <DropdownMenuItem key={item.name} asChild>
+                        <Link href={item.href} className="flex items-center">
+                          <item.icon className="mr-2 h-4 w-4" />
+                          {item.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="hidden sm:flex items-center space-x-2">
                 <Button variant="ghost" asChild>
-                  <Link href="/login">Login</Link>
+                  <Link href="/login">Sign In</Link>
                 </Button>
                 <Button asChild>
-                  <Link href="/signup">Join Team</Link>
+                  <Link href="/signup">Sign Up</Link>
                 </Button>
               </div>
             )}
 
-            {/* Mobile Menu Button */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            {/* Mobile Menu */}
+            <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
+                <Button variant="ghost" size="icon" className="lg:hidden">
                   <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <SheetHeader>
-                  <SheetTitle className="flex items-center gap-2">
-                    <Rocket className="h-5 w-5 text-primary" />
-                    AVASYA Research Lab
-                  </SheetTitle>
-                  <SheetDescription>Pioneering aerospace technology and space innovation</SheetDescription>
-                </SheetHeader>
-                <div className="mt-6 space-y-4">
-                  {navigationItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={cn(
-                        "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-                        pathname === item.href && "bg-accent text-accent-foreground",
-                      )}
-                    >
-                      {item.icon}
-                      <div>
-                        <div>{item.title}</div>
-                        <div className="text-xs text-muted-foreground">{item.description}</div>
-                      </div>
-                    </Link>
-                  ))}
+                <div className="flex flex-col space-y-4 mt-4">
+                  <div className="flex items-center space-x-2 pb-4 border-b">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src="/images/student-1.png" alt="User" />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">John Doe</span>
+                      <span className="text-xs text-muted-foreground">john.doe@example.com</span>
+                    </div>
+                  </div>
 
-                  {user && (
-                    <>
-                      <div className="border-t pt-4">
-                        <Link
-                          href={getDashboardLink()}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-                        >
-                          <BarChart3 className="h-4 w-4" />
-                          <span>{getDashboardLabel()}</span>
-                        </Link>
-                        <Link
-                          href="/profile"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-                        >
-                          <User className="h-4 w-4" />
-                          <span>Profile</span>
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          onClick={handleLogout}
-                          className="w-full justify-start text-red-600 hover:text-red-600 hover:bg-red-50"
-                        >
-                          <LogOut className="mr-2 h-4 w-4" />
-                          Log out
-                        </Button>
-                      </div>
-                    </>
-                  )}
+                  <nav className="flex flex-col space-y-2">
+                    {navigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={cn(
+                          "flex items-center space-x-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
+                          isActive(item.href) && "bg-accent text-accent-foreground",
+                        )}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.name}</span>
+                      </Link>
+                    ))}
+                  </nav>
 
-                  {!user && (
-                    <div className="border-t pt-4 space-y-2">
-                      <Button asChild className="w-full">
-                        <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                          Login
+                  <div className="border-t pt-4">
+                    <div className="flex flex-col space-y-2">
+                      {userNavigation.map((item) => (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className="flex items-center space-x-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                        >
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.name}</span>
                         </Link>
-                      </Button>
-                      <Button variant="outline" asChild className="w-full">
-                        <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                          Join Team
-                        </Link>
+                      ))}
+                      <Button variant="ghost" className="justify-start px-3">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Log out
                       </Button>
                     </div>
-                  )}
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
           </div>
         </div>
       </div>
-    </motion.header>
+    </header>
   )
 }
