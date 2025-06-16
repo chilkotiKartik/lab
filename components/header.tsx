@@ -37,7 +37,6 @@ import {
   Award,
   Shield,
   LogOut,
-  MessageSquare,
 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 
@@ -49,7 +48,6 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [notifications] = useState(3)
-  const [unreadAnnouncements, setUnreadAnnouncements] = useState(0)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,14 +56,6 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
-
-  useEffect(() => {
-    if (user && profile) {
-      // const userAnnouncements = getAnnouncements(profile.role)
-      // const unreadCount = userAnnouncements.filter(a => !a.isRead).length
-      setUnreadAnnouncements(0)
-    }
-  }, [user, profile])
 
   const handleLogout = async () => {
     try {
@@ -89,31 +79,31 @@ export default function Header() {
       title: "Home",
       href: "/",
       icon: <Home className="h-4 w-4" />,
-      description: "Welcome to AVASYA Research Lab",
+      description: "Welcome to Infinity Tech Society",
     },
     {
       title: "Projects",
       href: "/projects",
       icon: <FolderOpen className="h-4 w-4" />,
-      description: "Explore innovative research projects",
+      description: "Explore innovative projects",
     },
     {
       title: "Team",
       href: "/team",
       icon: <Users className="h-4 w-4" />,
-      description: "Meet our research team",
+      description: "Meet our amazing team",
     },
     {
       title: "Gallery",
       href: "/gallery",
       icon: <Palette className="h-4 w-4" />,
-      description: "3D interactive project gallery",
+      description: "3D interactive gallery",
     },
     {
       title: "About",
       href: "/about",
       icon: <Globe className="h-4 w-4" />,
-      description: "Learn about AVASYA Research Lab",
+      description: "Learn about Infinity Tech Society",
     },
     {
       title: "Contact",
@@ -126,34 +116,10 @@ export default function Header() {
   const userMenuItems = user
     ? [
         {
-          title:
-            profile?.role === "admin"
-              ? "Admin Dashboard"
-              : profile?.role === "teacher"
-                ? "Teacher Dashboard"
-                : "Student Dashboard",
-          href:
-            profile?.role === "admin"
-              ? "/admin/dashboard"
-              : profile?.role === "teacher"
-                ? "/teacher/dashboard"
-                : "/student/dashboard",
-          icon:
-            profile?.role === "admin" ? (
-              <Shield className="h-4 w-4" />
-            ) : profile?.role === "teacher" ? (
-              <User className="h-4 w-4" />
-            ) : (
-              <User className="h-4 w-4" />
-            ),
+          title: profile?.role === "admin" ? "Admin Dashboard" : "Dashboard",
+          href: profile?.role === "admin" ? "/admin" : "/dashboard",
+          icon: profile?.role === "admin" ? <Shield className="h-4 w-4" /> : <User className="h-4 w-4" />,
         },
-        ...(profile?.role === "student"
-          ? [
-              { title: "Team Chat", href: "/student/chat", icon: <MessageSquare className="h-4 w-4" /> },
-              { title: "Announcements", href: "/student/announcements", icon: <Bell className="h-4 w-4" /> },
-              { title: "Resources", href: "/student/resources", icon: <FolderOpen className="h-4 w-4" /> },
-            ]
-          : []),
         { title: "Settings", href: "/dashboard/settings", icon: <Settings className="h-4 w-4" /> },
         { title: "Achievements", href: "/dashboard/achievements", icon: <Award className="h-4 w-4" /> },
       ]
@@ -216,15 +182,13 @@ export default function Header() {
 
             {/* Notifications */}
             {user && (
-              <Button variant="ghost" size="icon" className="relative" asChild>
-                <Link href={profile?.role === "admin" ? "/admin/dashboard" : "/student/announcements"}>
-                  <Bell className="h-5 w-5" />
-                  {unreadAnnouncements > 0 && (
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-red-500">
-                      {unreadAnnouncements > 99 ? "99+" : unreadAnnouncements}
-                    </Badge>
-                  )}
-                </Link>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                {notifications > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-red-500">
+                    {notifications}
+                  </Badge>
+                )}
               </Button>
             )}
 
@@ -325,7 +289,7 @@ export default function Header() {
                   <nav className="flex flex-col space-y-2">
                     {navigationItems.map((item) => (
                       <Link
-                        key={item.href}
+                        key={item.name}
                         href={item.href}
                         className={`flex items-center space-x-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors ${
                           pathname === item.href ? "bg-accent text-accent-foreground" : ""

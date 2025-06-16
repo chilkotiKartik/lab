@@ -1,5 +1,3 @@
-import { realtimeService } from "./realtime-service"
-
 export interface Announcement {
   id: string
   title: string
@@ -12,9 +10,7 @@ export interface Announcement {
   priority: "low" | "medium" | "high"
 }
 
-const ANNOUNCEMENTS_CHANNEL = "announcements"
-
-// Initialize with some mock data
+// Mock announcements data
 let announcements: Announcement[] = [
   {
     id: "1",
@@ -38,16 +34,18 @@ let announcements: Announcement[] = [
     targetAudience: "students",
     priority: "high",
   },
+  {
+    id: "3",
+    title: "System Maintenance Scheduled",
+    content:
+      "The system will undergo maintenance on Sunday, March 10th from 2:00 AM to 6:00 AM. Please save your work before this time.",
+    type: "warning",
+    author: "Admin",
+    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+    targetAudience: "all",
+    priority: "high",
+  },
 ]
-
-// Load announcements from storage on initialization
-const storedAnnouncements = realtimeService.getStoredData(ANNOUNCEMENTS_CHANNEL)
-if (storedAnnouncements) {
-  announcements = storedAnnouncements
-} else {
-  // Save initial data
-  realtimeService.publish(ANNOUNCEMENTS_CHANNEL, announcements)
-}
 
 export const createAnnouncement = (announcement: Omit<Announcement, "id" | "createdAt">) => {
   const newAnnouncement: Announcement = {
@@ -55,10 +53,7 @@ export const createAnnouncement = (announcement: Omit<Announcement, "id" | "crea
     id: Date.now().toString(),
     createdAt: new Date().toISOString(),
   }
-
   announcements.unshift(newAnnouncement)
-  realtimeService.publish(ANNOUNCEMENTS_CHANNEL, announcements)
-
   return newAnnouncement
 }
 
@@ -71,22 +66,13 @@ export const getAnnouncements = (userRole?: string) => {
   )
 }
 
-export const subscribeToAnnouncements = (callback: (announcements: Announcement[]) => void) => {
-  return realtimeService.subscribe(ANNOUNCEMENTS_CHANNEL, (data: Announcement[]) => {
-    announcements = data
-    callback(data)
-  })
-}
-
 export const markAnnouncementAsRead = (id: string) => {
   const announcement = announcements.find((a) => a.id === id)
   if (announcement) {
     announcement.isRead = true
-    realtimeService.publish(ANNOUNCEMENTS_CHANNEL, announcements)
   }
 }
 
 export const deleteAnnouncement = (id: string) => {
   announcements = announcements.filter((a) => a.id !== id)
-  realtimeService.publish(ANNOUNCEMENTS_CHANNEL, announcements)
 }
