@@ -19,7 +19,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login, user, profile } = useAuth()
+  const { login, user, profile, loading } = useAuth()
   const { toast } = useToast()
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
@@ -28,18 +28,47 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [showHint, setShowHint] = useState(false)
 
-  // If user is already logged in, redirect to appropriate dashboard
+  const [redirecting, setRedirecting] = useState(false)
+
   useEffect(() => {
+    if (loading) return
+
+    let timeoutId: NodeJS.Timeout
+
     if (user && profile) {
-      if (profile.role === "admin") {
-        router.push("/admin/dashboard")
-      } else if (profile.role === "teacher") {
-        router.push("/teacher/dashboard")
-      } else {
-        router.push("/student/dashboard")
+      setRedirecting(true)
+      // Add a small delay to ensure state is fully updated
+      timeoutId = setTimeout(() => {
+        if (profile.role === "admin") {
+          router.push("/admin/dashboard")
+        } else if (profile.role === "teacher") {
+          router.push("/teacher/dashboard")
+        } else {
+          router.push("/student/dashboard")
+        }
+      }, 100)
+    } else {
+      setRedirecting(false)
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
       }
     }
-  }, [user, profile, router])
+  }, [user, profile, loading, router])
+
+  // Add loading state check at the beginning of the component
+  if (loading || redirecting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

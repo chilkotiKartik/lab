@@ -1,595 +1,485 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import AdminLayout from "@/components/admin/admin-layout"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CharacterAvatar } from "@/components/character-avatar"
 import { useAuth } from "@/components/auth-provider"
-import { SpaceBackground } from "@/components/space-background"
-import { SpaceParticles } from "@/components/space-particles"
+import { useRouter } from "next/navigation"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Users,
-  TrendingUp,
-  AlertCircle,
-  BookOpen,
-  Plus,
-  UserPlus,
-  CheckCircle2,
-  XCircle,
-  FileText,
-  Rocket,
+  FolderOpen,
   BarChart3,
+  Settings,
+  Bell,
+  Search,
+  Plus,
+  Eye,
+  Edit,
+  Trash2,
+  Send,
+  AlertCircle,
+  CheckCircle,
+  Clock,
 } from "lucide-react"
-import Link from "next/link"
-import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { motion } from "framer-motion"
+import { getAllUsers, USERS_DATA } from "@/lib/auth-service"
 
-// Mock data
-const stats = {
-  students: 128,
-  teachers: 24,
-  courses: 15,
-  pendingApprovals: 7,
-  activeUsers: 87,
-  totalResearch: 42,
-  totalProjects: 18,
-  studentGrowth: 12,
-  teacherGrowth: 5,
-  courseGrowth: 8,
-}
-
-const recentActivity = [
-  {
-    id: "1",
-    type: "research",
-    title: "Quantum Navigation Systems for Interplanetary Travel",
-    author: "Dr. Elara Vega",
-    status: "pending",
-    time: "2 hours ago",
-  },
-  {
-    id: "2",
-    type: "project",
-    title: "BioDrone Initiative",
-    author: "Dr. Aiden Mercer",
-    status: "pending",
-    time: "5 hours ago",
-  },
-  {
-    id: "3",
-    type: "user",
-    title: "New User Registration",
-    author: "Sophia Chen",
-    status: "new",
-    time: "1 day ago",
-  },
-  {
-    id: "4",
-    type: "research",
-    title: "Self-Healing Materials for Orbital Debris Protection",
-    author: "Prof. Kai Zhang",
-    status: "approved",
-    time: "2 days ago",
-  },
-]
-
-const pendingApprovals = [
-  {
-    id: "1",
-    name: "Sophia Chen",
-    email: "sophia.chen@example.com",
-    role: "student",
-    department: "Aerospace Engineering",
-    requestDate: "2023-07-10",
-  },
-  {
-    id: "2",
-    name: "Dr. Marcus Williams",
-    email: "m.williams@example.com",
-    role: "teacher",
-    department: "Quantum Physics",
-    requestDate: "2023-07-09",
-  },
-  {
-    id: "3",
-    name: "Aiden Park",
-    email: "aiden.park@example.com",
-    role: "student",
-    department: "Materials Science",
-    requestDate: "2023-07-08",
-  },
-]
-
-const recentCourses = [
-  {
-    id: "1",
-    title: "Introduction to Quantum Physics",
-    instructor: "Dr. Rajesh Kumar",
-    students: [
-      { role: "student", variant: 1 },
-      { role: "student", variant: 2 },
-      { role: "student", variant: 3 },
-    ],
-    progress: 65,
-    status: "active",
-  },
-  {
-    id: "2",
-    title: "Advanced Aerospace Design",
-    instructor: "Prof. Sarah Chen",
-    students: [
-      { role: "student", variant: 4 },
-      { role: "student", variant: 5 },
-      { role: "student", variant: 1 },
-    ],
-    progress: 45,
-    status: "active",
-  },
-  {
-    id: "3",
-    title: "Materials Science Fundamentals",
-    instructor: "Dr. James Wilson",
-    students: [
-      { role: "student", variant: 2 },
-      { role: "student", variant: 3 },
-      { role: "student", variant: 4 },
-      { role: "student", variant: 5 },
-    ],
-    progress: 80,
-    status: "active",
-  },
-]
-
-export default function AdminDashboardPage() {
+export default function AdminDashboard() {
+  const { user, profile, loading, isAuthenticated } = useAuth()
   const router = useRouter()
-  const { user, isLoading } = useAuth()
-  const [activeTab, setActiveTab] = useState("overview")
+  const [dashboardLoading, setDashboardLoading] = useState(true)
+  const [users, setUsers] = useState(USERS_DATA)
+  const [announcement, setAnnouncement] = useState("")
+  const [searchTerm, setSearchTerm] = useState("")
 
-  // Redirect if not logged in or not an admin
   useEffect(() => {
-    if (!isLoading && (!user || user.role !== "admin")) {
-      router.push("/login")
+    if (!loading) {
+      if (!isAuthenticated || !user || !profile) {
+        router.push("/login")
+      } else if (profile.role !== "admin") {
+        router.push("/student/dashboard")
+      } else {
+        setDashboardLoading(false)
+        loadUsers()
+      }
     }
-  }, [user, isLoading, router])
+  }, [loading, isAuthenticated, user, profile, router])
 
-  if (isLoading) {
+  const loadUsers = async () => {
+    try {
+      const allUsers = await getAllUsers()
+      setUsers(allUsers)
+    } catch (error) {
+      console.error("Failed to load users:", error)
+      // Use mock data as fallback
+      setUsers(USERS_DATA)
+    }
+  }
+
+  const sendAnnouncement = () => {
+    if (announcement.trim()) {
+      // In a real app, this would send to all users
+      console.log("Sending announcement:", announcement)
+      setAnnouncement("")
+      // Show success message
+      alert("Announcement sent to all users!")
+    }
+  }
+
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.projectTitle?.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
+  if (loading || dashboardLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading admin dashboard...</p>
+        </div>
       </div>
     )
   }
 
+  if (!profile || profile.role !== "admin") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
+          <p className="text-destructive">Access denied. Admin privileges required.</p>
+          <Button onClick={() => router.push("/login")}>Go to Login</Button>
+        </div>
+      </div>
+    )
+  }
+
+  const stats = [
+    {
+      title: "Total Students",
+      value: users.filter((u) => u.role === "student").length,
+      icon: <Users className="h-5 w-5" />,
+      color: "text-blue-600",
+      bgColor: "bg-blue-100",
+    },
+    {
+      title: "Active Projects",
+      value: users.filter((u) => u.projectTitle).length,
+      icon: <FolderOpen className="h-5 w-5" />,
+      color: "text-green-600",
+      bgColor: "bg-green-100",
+    },
+    {
+      title: "Pending Reviews",
+      value: "8",
+      icon: <Clock className="h-5 w-5" />,
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-100",
+    },
+    {
+      title: "Completed Projects",
+      value: "3",
+      icon: <CheckCircle className="h-5 w-5" />,
+      color: "text-purple-600",
+      bgColor: "bg-purple-100",
+    },
+  ]
+
   return (
-    <AdminLayout>
-      <div className="relative space-y-6">
-        <div className="absolute inset-0 -z-10 opacity-10">
-          <SpaceBackground starCount={100} />
-          <SpaceParticles particleCount={20} />
-        </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
+      <div className="container mx-auto p-6 space-y-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, {user?.name || "Admin"}</p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+        >
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold">Admin Dashboard 🛠️</h1>
+            <p className="text-muted-foreground">Manage projects, users, and system settings</p>
           </div>
-          <div className="flex gap-2">
-            <Button asChild>
-              <Link href="/admin/users/create">
-                <UserPlus className="mr-2 h-4 w-4" /> Add User
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/admin/courses/create">
-                <Plus className="mr-2 h-4 w-4" /> New Course
-              </Link>
-            </Button>
+          <div className="flex items-center gap-3">
+            <Avatar className="h-12 w-12">
+              <AvatarFallback>AD</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium">{profile.name}</p>
+              <p className="text-sm text-muted-foreground">Administrator</p>
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Admin Profile Card */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <CharacterAvatar role="admin" size="lg" animation="pulse" className="cosmic-glow" />
-              </motion.div>
-              <div className="flex-1">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        {/* Stats Cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {stats.map((stat, index) => (
+            <Card key={index} className="bg-card/50 backdrop-blur-sm border-border/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold">{user?.name || "Admin User"}</h2>
-                    <p className="text-muted-foreground">{user?.email || "admin@avasya-lab.com"}</p>
+                    <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                    <p className="text-2xl font-bold">{stat.value}</p>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="bg-amber-500/10 text-amber-500">
-                      Administrator
-                    </Badge>
-                    <Badge variant="outline" className="bg-green-500/10 text-green-500">
-                      Full Access
-                    </Badge>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground">Pending Approvals</p>
-                      <AlertCircle className="h-4 w-4 text-amber-500" />
-                    </div>
-                    <p className="text-2xl font-bold mt-1">{stats.pendingApprovals}</p>
-                  </div>
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground">Active Users</p>
-                      <Users className="h-4 w-4 text-blue-500" />
-                    </div>
-                    <p className="text-2xl font-bold mt-1">{stats.activeUsers}</p>
-                  </div>
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground">Total Courses</p>
-                      <BookOpen className="h-4 w-4 text-purple-500" />
-                    </div>
-                    <p className="text-2xl font-bold mt-1">{stats.courses}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tabs */}
-        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="approvals">
-              Pending Approvals <Badge className="ml-2 bg-primary">{pendingApprovals.length}</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="courses">Courses</TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-                <Card className="bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Students</CardTitle>
-                    <Users className="h-4 w-4 text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.students}</div>
-                    <p className="text-xs text-muted-foreground flex items-center">
-                      <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-                      <span className="text-green-500">{stats.studentGrowth}%</span> from last month
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-              >
-                <Card className="bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Teachers</CardTitle>
-                    <Users className="h-4 w-4 text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.teachers}</div>
-                    <p className="text-xs text-muted-foreground flex items-center">
-                      <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-                      <span className="text-green-500">{stats.teacherGrowth}%</span> from last month
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
-              >
-                <Card className="bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Research</CardTitle>
-                    <FileText className="h-4 w-4 text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.totalResearch}</div>
-                    <p className="text-xs text-muted-foreground">{stats.pendingApprovals} pending approval</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
-              >
-                <Card className="bg-card/50 backdrop-blur-sm border-border">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Projects</CardTitle>
-                    <Rocket className="h-4 w-4 text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.totalProjects}</div>
-                    <p className="text-xs text-muted-foreground">{Math.floor(stats.totalProjects * 0.3)} in progress</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </div>
-
-            {/* Recent Activity */}
-            <Card className="bg-card/50 backdrop-blur-sm border-border">
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`p-2 rounded-full ${
-                            activity.type === "research"
-                              ? "bg-blue-500/10"
-                              : activity.type === "project"
-                                ? "bg-purple-500/10"
-                                : "bg-green-500/10"
-                          }`}
-                        >
-                          {activity.type === "research" && <FileText className="h-4 w-4 text-blue-500" />}
-                          {activity.type === "project" && <Rocket className="h-4 w-4 text-purple-500" />}
-                          {activity.type === "user" && <Users className="h-4 w-4 text-green-500" />}
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">{activity.title}</p>
-                          <p className="text-xs text-muted-foreground">{activity.author}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant={
-                            activity.status === "pending"
-                              ? "outline"
-                              : activity.status === "approved"
-                                ? "default"
-                                : "secondary"
-                          }
-                          className={
-                            activity.status === "pending"
-                              ? "bg-amber-500/10 text-amber-500"
-                              : activity.status === "approved"
-                                ? "bg-green-500/10 text-green-500"
-                                : "bg-blue-500/10 text-blue-500"
-                          }
-                        >
-                          {activity.status}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">{activity.time}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Analytics Summary */}
-            <Card className="bg-card/50 backdrop-blur-sm border-border">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Analytics Summary</CardTitle>
-                <Button variant="outline" size="sm">
-                  <BarChart3 className="h-4 w-4 mr-2" /> Full Report
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm">Student Engagement</span>
-                      <span className="text-sm font-medium">78%</span>
-                    </div>
-                    <Progress value={78} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm">Research Completion</span>
-                      <span className="text-sm font-medium">62%</span>
-                    </div>
-                    <Progress value={62} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm">Project Success Rate</span>
-                      <span className="text-sm font-medium">91%</span>
-                    </div>
-                    <Progress value={91} className="h-2" />
+                  <div className={`p-3 rounded-full ${stat.bgColor}`}>
+                    <div className={stat.color}>{stat.icon}</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          ))}
+        </motion.div>
 
-          {/* Approvals Tab */}
-          <TabsContent value="approvals" className="space-y-6">
-            <Card className="bg-card/50 backdrop-blur-sm border-border">
-              <CardHeader>
-                <CardTitle>Pending User Approvals</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {pendingApprovals.map((approval) => (
-                    <motion.div
-                      key={approval.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/30 rounded-lg gap-4"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarFallback>{approval.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{approval.name}</p>
-                          <p className="text-sm text-muted-foreground">{approval.email}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge
-                              variant="outline"
-                              className={
-                                approval.role === "student"
-                                  ? "bg-blue-500/10 text-blue-500"
-                                  : "bg-purple-500/10 text-purple-500"
-                              }
-                            >
-                              {approval.role}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground">{approval.department}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 self-end sm:self-center">
-                        <span className="text-xs text-muted-foreground mr-2">Requested: {approval.requestDate}</span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-green-500 text-green-500 hover:bg-green-500/10"
-                        >
-                          <CheckCircle2 className="h-4 w-4 mr-1" /> Approve
-                        </Button>
-                        <Button size="sm" variant="outline" className="border-red-500 text-red-500 hover:bg-red-500/10">
-                          <XCircle className="h-4 w-4 mr-1" /> Reject
-                        </Button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+        {/* Main Content */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <Tabs defaultValue="users" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="announcements">Announcements</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
+            </TabsList>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-border">
-              <CardHeader>
-                <CardTitle>Pending Content Reviews</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentActivity
-                    .filter((a) => a.status === "pending")
-                    .map((activity) => (
-                      <motion.div
-                        key={activity.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/30 rounded-lg gap-4"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`p-2 rounded-full ${
-                              activity.type === "research" ? "bg-blue-500/10" : "bg-purple-500/10"
-                            }`}
-                          >
-                            {activity.type === "research" && <FileText className="h-4 w-4 text-blue-500" />}
-                            {activity.type === "project" && <Rocket className="h-4 w-4 text-purple-500" />}
-                          </div>
+            <TabsContent value="users" className="space-y-6">
+              <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Users className="h-5 w-5" />
+                        User Management
+                      </CardTitle>
+                      <CardDescription>Manage all registered users and their projects</CardDescription>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search users..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-10 w-64"
+                        />
+                      </div>
+                      <Button>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add User
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {filteredUsers.map((user, index) => (
+                      <div key={index} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                        <div className="flex items-center gap-4">
+                          <Avatar>
+                            <AvatarFallback>{user.name?.charAt(0) || "U"}</AvatarFallback>
+                          </Avatar>
                           <div>
-                            <p className="font-medium">{activity.title}</p>
-                            <p className="text-sm text-muted-foreground">By {activity.author}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="outline" className="bg-amber-500/10 text-amber-500">
-                                {activity.status}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">{activity.time}</span>
-                            </div>
+                            <p className="font-medium">{user.name}</p>
+                            <p className="text-sm text-muted-foreground">{user.email}</p>
+                            <p className="text-xs text-muted-foreground">{user.projectTitle}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 self-end sm:self-center">
-                          <Button size="sm" asChild>
-                            <Link href={`/admin/reviews/${activity.type}s/${activity.id}`}>Review</Link>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={user.role === "admin" ? "destructive" : "secondary"}>{user.role}</Badge>
+                          <Button variant="ghost" size="icon">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon">
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          {/* Courses Tab */}
-          <TabsContent value="courses" className="space-y-6">
-            <Card className="bg-card/50 backdrop-blur-sm border-border">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Active Courses</CardTitle>
-                <Button asChild>
-                  <Link href="/admin/courses/create">
-                    <Plus className="h-4 w-4 mr-2" /> New Course
-                  </Link>
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {recentCourses.map((course) => (
-                    <motion.div
-                      key={course.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="p-4 bg-muted/30 rounded-lg"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <TabsContent value="projects" className="space-y-6">
+              <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FolderOpen className="h-5 w-5" />
+                    Project Management
+                  </CardTitle>
+                  <CardDescription>Monitor and manage all ongoing projects</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {users
+                      .filter((u) => u.projectTitle)
+                      .map((user, index) => (
+                        <Card key={index} className="bg-muted/30">
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-lg">{user.projectTitle}</CardTitle>
+                            <CardDescription>Lead: {user.name}</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span>Progress</span>
+                                <span>75%</span>
+                              </div>
+                              <div className="w-full bg-muted rounded-full h-2">
+                                <div className="bg-primary h-2 rounded-full" style={{ width: "75%" }}></div>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-2">
+                                Team: {user.teamMembers?.length || 0} members
+                              </p>
+                              <div className="flex gap-2 mt-3">
+                                <Button size="sm" variant="outline">
+                                  View
+                                </Button>
+                                <Button size="sm">Review</Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="announcements" className="space-y-6">
+              <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bell className="h-5 w-5" />
+                    Send Announcement
+                  </CardTitle>
+                  <CardDescription>Broadcast messages to all users</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Textarea
+                    placeholder="Type your announcement here..."
+                    value={announcement}
+                    onChange={(e) => setAnnouncement(e.target.value)}
+                    rows={4}
+                  />
+                  <Button onClick={sendAnnouncement} disabled={!announcement.trim()}>
+                    <Send className="h-4 w-4 mr-2" />
+                    Send to All Users
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                <CardHeader>
+                  <CardTitle>Recent Announcements</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[
+                      { title: "Project Deadline Extended", date: "2 days ago", type: "info" },
+                      { title: "New Research Guidelines", date: "1 week ago", type: "important" },
+                      { title: "System Maintenance Notice", date: "2 weeks ago", type: "warning" },
+                    ].map((announcement, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                         <div>
-                          <h3 className="font-medium">{course.title}</h3>
-                          <p className="text-sm text-muted-foreground">Instructor: {course.instructor}</p>
+                          <p className="font-medium">{announcement.title}</p>
+                          <p className="text-sm text-muted-foreground">{announcement.date}</p>
                         </div>
                         <Badge
-                          variant={course.status === "active" ? "default" : "outline"}
-                          className={course.status === "active" ? "bg-green-500/10 text-green-500" : ""}
+                          variant={
+                            announcement.type === "important"
+                              ? "destructive"
+                              : announcement.type === "warning"
+                                ? "secondary"
+                                : "outline"
+                          }
                         >
-                          {course.status}
+                          {announcement.type}
                         </Badge>
                       </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                      <div className="mt-4">
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm">Course Progress</span>
-                          <span className="text-sm font-medium">{course.progress}%</span>
+            <TabsContent value="analytics" className="space-y-6">
+              <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    System Analytics
+                  </CardTitle>
+                  <CardDescription>Overview of system usage and performance</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Project Status Distribution</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm">In Progress</span>
+                          <span className="text-sm font-medium">8 projects</span>
                         </div>
-                        <Progress value={course.progress} className="h-2" />
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div className="bg-blue-500 h-2 rounded-full" style={{ width: "67%" }}></div>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Completed</span>
+                          <span className="text-sm font-medium">3 projects</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div className="bg-green-500 h-2 rounded-full" style={{ width: "25%" }}></div>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Under Review</span>
+                          <span className="text-sm font-medium">1 project</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div className="bg-yellow-500 h-2 rounded-full" style={{ width: "8%" }}></div>
+                        </div>
                       </div>
+                    </div>
 
-                      <div className="flex justify-between items-center mt-4">
-                        <div className="flex -space-x-2">
-                          {course.students.map((student, index) => (
-                            <div key={index} className="relative">
-                              <CharacterAvatar role={student.role} variant={student.variant} size="sm" />
-                            </div>
-                          ))}
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-xs font-medium">
-                            +{course.students.length}
-                          </div>
+                    <div className="space-y-4">
+                      <h4 className="font-medium">User Activity</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Daily Active Users</span>
+                          <span className="text-sm font-medium">24</span>
                         </div>
-                        <Button size="sm" variant="outline" asChild>
-                          <Link href={`/admin/courses/${course.id}`}>Manage</Link>
-                        </Button>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Weekly Active Users</span>
+                          <span className="text-sm font-medium">32</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Total Submissions</span>
+                          <span className="text-sm font-medium">156</span>
+                        </div>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="settings" className="space-y-6">
+              <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="h-5 w-5" />
+                    System Settings
+                  </CardTitle>
+                  <CardDescription>Configure system preferences and settings</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="font-medium">General Settings</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Allow New Registrations</span>
+                          <Button variant="outline" size="sm">
+                            Enabled
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Email Notifications</span>
+                          <Button variant="outline" size="sm">
+                            Enabled
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Maintenance Mode</span>
+                          <Button variant="outline" size="sm">
+                            Disabled
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Security Settings</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Two-Factor Authentication</span>
+                          <Button variant="outline" size="sm">
+                            Required
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Session Timeout</span>
+                          <Button variant="outline" size="sm">
+                            24 hours
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Password Policy</span>
+                          <Button variant="outline" size="sm">
+                            Strong
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </motion.div>
       </div>
-    </AdminLayout>
+    </div>
   )
 }
