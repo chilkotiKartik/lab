@@ -31,14 +31,19 @@ import {
   Music,
   Palette,
   Brain,
-  Shield,
-  Mic,
   Activity,
   Code,
   Globe,
+  Star,
+  MessageSquare,
+  FileText,
+  Settings,
 } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import { HomeNotification } from "@/components/home-notification"
+import { SpaceBackground } from "@/components/space-background"
+import { SpaceParticles } from "@/components/space-particles"
+import { FloatingAstronaut } from "@/components/floating-astronaut"
 
 export default function Home() {
   const { toast } = useToast()
@@ -47,6 +52,7 @@ export default function Home() {
   const [isNewsletterSubmitting, setIsNewsletterSubmitting] = useState(false)
   const [activeFeature, setActiveFeature] = useState(0)
   const [likedItems, setLikedItems] = useState<Record<string, boolean>>({})
+  const [visibleProjects, setVisibleProjects] = useState(4)
 
   const targetRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
@@ -131,56 +137,109 @@ export default function Home() {
   // Latest projects showcase
   const latestProjects = [
     {
-      id: "fraud-detection-ai",
-      title: "Advanced Fraud Detection System",
-      description: "Real-time fraud detection using machine learning algorithms to protect financial transactions",
-      image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=600&auto=format&fit=crop",
-      author: "Team Alpha",
+      id: "cultural-drift-nlp",
+      title: "Cultural Drift NLP",
+      description:
+        "Advanced natural language processing system analyzing cultural evolution patterns in digital communications",
+      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop",
+      author: "Aishwarya Maan Srivastava",
       authorAvatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?q=80&w=150&auto=format&fit=crop",
-      category: "Fraud Detection",
-      impact: "99.7% accuracy rate",
-      contributors: 12,
+      category: "NLP & Cultural Studies",
+      impact: "92% pattern recognition",
+      contributors: 3,
       publishedDate: "2024-01-15",
-      icon: <Shield className="h-5 w-5" />,
+      icon: <MessageSquare className="h-5 w-5" />,
     },
     {
-      id: "quantum-state-analyzer",
-      title: "Quantum State Qualifier",
-      description: "Advanced quantum computing system for analyzing and qualifying quantum states in real-time",
-      image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=600&auto=format&fit=crop",
-      author: "Team Beta",
+      id: "language-loss-rebuilder",
+      title: "Language Loss Rebuilder",
+      description: "AI system for preserving and reconstructing endangered languages using machine learning",
+      image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=600&auto=format&fit=crop",
+      author: "Rudra Narayan Meher",
       authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
-      category: "Quantum Computing",
-      impact: "Quantum supremacy achieved",
-      contributors: 8,
-      publishedDate: "2024-02-08",
+      category: "Language Preservation",
+      impact: "5 languages preserved",
+      contributors: 5,
+      publishedDate: "2024-01-28",
+      icon: <Globe className="h-5 w-5" />,
+    },
+    {
+      id: "contract-summarizer",
+      title: "Contract Summarizer",
+      description: "AI-powered system that analyzes and summarizes complex legal contracts with high accuracy",
+      image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=600&auto=format&fit=crop",
+      author: "Krishna Vallabha Goswami",
+      authorAvatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=150&auto=format&fit=crop",
+      category: "Legal Tech",
+      impact: "98% accuracy rate",
+      contributors: 2,
+      publishedDate: "2024-02-05",
+      icon: <FileText className="h-5 w-5" />,
+    },
+    {
+      id: "prompt-feedback-tuner",
+      title: "Prompt Feedback Tuner",
+      description: "System for optimizing AI prompts through automated feedback loops and performance analysis",
+      image: "https://images.unsplash.com/photo-1526378722484-bd91ca387e72?q=80&w=600&auto=format&fit=crop",
+      author: "Satyam Singh",
+      authorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop",
+      category: "AI Optimization",
+      impact: "40% efficiency increase",
+      contributors: 3,
+      publishedDate: "2024-02-10",
+      icon: <Settings className="h-5 w-5" />,
+    },
+    {
+      id: "turbulence-generator-gan",
+      title: "Turbulence Generator GAN",
+      description: "Generative Adversarial Network for creating realistic turbulence patterns in fluid dynamics",
+      image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=600&auto=format&fit=crop",
+      author: "Swastik Joshi",
+      authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
+      category: "Fluid Dynamics",
+      impact: "Revolutionary simulation",
+      contributors: 5,
+      publishedDate: "2024-01-20",
       icon: <Atom className="h-5 w-5" />,
     },
     {
-      id: "heat-speech-detector",
-      title: "Heat Speech Detection System",
-      description: "AI-powered system that detects hate speech and toxic content across multiple platforms",
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop",
-      author: "Team Gamma",
-      authorAvatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=150&auto=format&fit=crop",
-      category: "NLP & AI",
-      impact: "92% detection accuracy",
-      contributors: 15,
-      publishedDate: "2024-01-28",
-      icon: <Mic className="h-5 w-5" />,
-    },
-    {
-      id: "digital-body-twins",
-      title: "Digital Body Twins",
+      id: "digital-body-twin",
+      title: "Digital Body Twin",
       description: "Create digital replicas of human bodies for medical simulation and personalized healthcare",
       image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?q=80&w=600&auto=format&fit=crop",
-      author: "Team Delta",
+      author: "Ghantasala Dhruvann",
       authorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop",
       category: "Healthcare AI",
       impact: "Personalized medicine revolution",
-      contributors: 20,
+      contributors: 5,
       publishedDate: "2024-02-15",
       icon: <Activity className="h-5 w-5" />,
+    },
+    {
+      id: "particle-pattern-finder",
+      title: "Particle Pattern Finder",
+      description: "Advanced algorithm for detecting patterns in particle physics data using machine learning",
+      image: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=600&auto=format&fit=crop",
+      author: "Niraj Kumar",
+      authorAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
+      category: "Particle Physics",
+      impact: "New particle discovery",
+      contributors: 2,
+      publishedDate: "2024-01-25",
+      icon: <Atom className="h-5 w-5" />,
+    },
+    {
+      id: "medical-symptom-chatbot",
+      title: "Medical Symptom Chatbot",
+      description: "AI-powered chatbot for preliminary medical symptom analysis and healthcare recommendations",
+      image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=600&auto=format&fit=crop",
+      author: "Meet Parmar",
+      authorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop",
+      category: "Healthcare",
+      impact: "85% diagnostic accuracy",
+      contributors: 3,
+      publishedDate: "2024-02-01",
+      icon: <MessageSquare className="h-5 w-5" />,
     },
   ]
 
@@ -222,6 +281,10 @@ export default function Home() {
     })
   }
 
+  const loadMoreProjects = () => {
+    setVisibleProjects((prev) => Math.min(prev + 4, latestProjects.length))
+  }
+
   return (
     <div className="relative overflow-hidden">
       {!user && <HomeNotification />}
@@ -229,34 +292,10 @@ export default function Home() {
       {/* Enhanced Hero Section */}
       <div ref={targetRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Dynamic Background */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/50 to-blue-900/50" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM5QzkyQUMiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIxIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
+        <SpaceBackground />
+        <SpaceParticles />
 
-          {/* Floating Elements */}
-          {[...Array(30)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-primary/40 rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -50, 0],
-                opacity: [0.2, 1, 0.2],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: 4 + Math.random() * 3,
-                repeat: Number.POSITIVE_INFINITY,
-                delay: Math.random() * 3,
-              }}
-            />
-          ))}
-        </div>
-
-        <motion.div className="container mx-auto px-4 relative z-10" style={{ y, opacity, scale }}>
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
             ref={heroRef}
             className="text-center max-w-7xl mx-auto"
@@ -310,23 +349,35 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.7 }}
             >
+              {!user ? (
+                <Link href="/login">
+                  <Button
+                    size="lg"
+                    className="rounded-full px-10 py-6 text-lg bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-2xl shadow-primary/25 transform hover:scale-105 transition-all duration-300"
+                  >
+                    <Rocket className="mr-3 h-6 w-6" />
+                    Launch Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/dashboard">
+                  <Button
+                    size="lg"
+                    className="rounded-full px-10 py-6 text-lg bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-2xl shadow-primary/25 transform hover:scale-105 transition-all duration-300"
+                  >
+                    <Rocket className="mr-3 h-6 w-6" />
+                    Continue Journey
+                  </Button>
+                </Link>
+              )}
               <Link href="/projects">
-                <Button
-                  size="lg"
-                  className="rounded-full px-10 py-6 text-lg bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-2xl shadow-primary/25 transform hover:scale-105 transition-all duration-300"
-                >
-                  <Rocket className="mr-3 h-6 w-6" />
-                  Explore Projects
-                </Button>
-              </Link>
-              <Link href="/team">
                 <Button
                   variant="outline"
                   size="lg"
                   className="rounded-full px-10 py-6 text-lg border-2 border-primary/50 hover:bg-primary/10 backdrop-blur-sm"
                 >
                   <Users className="mr-3 h-6 w-6" />
-                  Meet the Team
+                  Explore Projects
                 </Button>
               </Link>
               <Link href="/gallery">
@@ -375,7 +426,12 @@ export default function Home() {
               ))}
             </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
+
+        {/* Floating Astronaut */}
+        <div className="absolute right-[5%] top-[20%] hidden lg:block">
+          <FloatingAstronaut />
+        </div>
 
         {/* Scroll Indicator */}
         <motion.div
@@ -587,7 +643,13 @@ export default function Home() {
 
       {/* Latest Projects Grid */}
       <div className="py-24 relative">
-        <div className="container mx-auto px-4">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full filter blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-purple-500/5 rounded-full filter blur-3xl" />
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
             className="text-center mb-20"
             initial={{ opacity: 0, y: 30 }}
@@ -612,7 +674,7 @@ export default function Home() {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8 mb-12">
-            {latestProjects.map((project, index) => (
+            {latestProjects.slice(0, visibleProjects).map((project, index) => (
               <motion.div
                 key={project.id}
                 className="group bg-card/50 backdrop-blur-sm rounded-2xl border border-border overflow-hidden hover:shadow-2xl transition-all duration-500"
@@ -626,24 +688,18 @@ export default function Home() {
                   <Image
                     src={project.image || "/placeholder.svg"}
                     alt={project.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    width={600}
+                    height={400}
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                  <div className="absolute top-4 left-4">
-                    <div className="p-2 bg-primary/20 rounded-lg backdrop-blur-sm">{project.icon}</div>
-                  </div>
-                  <Badge className="absolute top-4 right-4 bg-primary/90 text-white">{project.category}</Badge>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <div className="flex items-center gap-2 text-white">
-                      <TrendingUp className="h-4 w-4 text-green-400" />
-                      <span className="text-sm font-medium text-green-400">{project.impact}</span>
-                    </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                  <div className="absolute bottom-0 left-0 p-6 w-full">
+                    <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
+                    <p className="text-gray-300 text-sm line-clamp-2">{project.description}</p>
                   </div>
                 </div>
-
                 <div className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-4 mb-4">
                     <div className="w-10 h-10 rounded-full overflow-hidden">
                       <Image
                         src={project.authorAvatar || "/placeholder.svg"}
@@ -654,107 +710,78 @@ export default function Home() {
                       />
                     </div>
                     <div>
-                      <span className="font-medium">{project.author}</span>
-                      <div className="text-xs text-muted-foreground">{project.publishedDate}</div>
+                      <h4 className="font-medium">{project.author}</h4>
+                      <p className="text-muted-foreground text-sm">{project.category}</p>
                     </div>
                   </div>
-
-                  <h3 className="text-xl font-bold font-space mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm mb-4 line-clamp-3">{project.description}</p>
-
-                  <div className="flex justify-between items-center">
-                    <div className="flex gap-3">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleLike(project.id)}
-                        className={likedItems[project.id] ? "text-red-500" : ""}
-                      >
-                        <Heart className={`h-4 w-4 ${likedItems[project.id] ? "fill-current" : ""}`} />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Share2 className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <Link href={`/projects/${project.id}`}>
-                      <Button variant="outline" size="sm" className="rounded-full">
-                        View Project
-                      </Button>
-                    </Link>
-                  </div>
-
-                  <div className="flex justify-between mt-4 text-xs text-muted-foreground border-t border-border pt-4">
-                    <span className="flex items-center gap-1">
-                      <Users className="h-3 w-3" /> {project.contributors} contributors
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      {project.impact}
                     </span>
-                    <span>{project.publishedDate}</span>
+                    <span className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      {project.contributors} Contributors
+                    </span>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
 
-          <div className="text-center">
-            <Link href="/projects">
-              <Button size="lg" variant="outline" className="rounded-full px-8 py-4 text-lg">
-                Explore All Projects <ArrowRight className="ml-2 h-5 w-5" />
+          {visibleProjects < latestProjects.length && (
+            <div className="text-center">
+              <Button variant="outline" size="lg" className="rounded-full px-8 py-4" onClick={loadMoreProjects}>
+                Load More Projects
               </Button>
-            </Link>
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Community Section */}
-      <div className="py-24 bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5 relative overflow-hidden">
+      {/* Newsletter Subscription */}
+      <div className="py-24 bg-muted">
         <div className="container mx-auto px-4">
           <motion.div
-            className="max-w-5xl mx-auto text-center"
+            className="max-w-3xl mx-auto text-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <Badge className="mb-8 bg-primary/10 text-primary border-primary/20 text-lg px-6 py-2">
-              <Sparkles className="h-5 w-5 mr-2" />
-              Join Our Community
+            <Badge className="mb-6 bg-purple-600/10 text-purple-600 border-purple-600/20 text-lg px-6 py-2">
+              <Star className="h-5 w-5 mr-2" />
+              Join Our Newsletter
             </Badge>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold font-space mb-8">
-              Be Part of{" "}
-              <span className="bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
-                Something Bigger
-              </span>
-            </h2>
-            <p className="text-muted-foreground text-xl mb-12 max-w-3xl mx-auto leading-relaxed">
-              Join thousands of innovators, developers, and creators who are building the future together. Get exclusive
-              access to cutting-edge projects, mentorship, and collaboration opportunities.
+            <h2 className="text-4xl sm:text-5xl font-bold font-space mb-8">Stay Updated with the Latest Tech Trends</h2>
+            <p className="text-muted-foreground text-xl mb-12">
+              Subscribe to our newsletter and get the latest tech news, project updates, and community insights
+              delivered straight to your inbox.
             </p>
-
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto mb-8">
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4">
               <Input
                 type="email"
-                placeholder="Enter your email to join the revolution"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 h-14 text-center sm:text-left text-lg rounded-xl"
+                className="rounded-full px-6 py-4 text-lg"
               />
               <Button
                 type="submit"
+                className="rounded-full px-10 py-4 text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                 disabled={isNewsletterSubmitting}
-                className="h-14 px-8 text-lg bg-gradient-to-r from-primary to-purple-600 rounded-xl"
               >
-                {isNewsletterSubmitting ? "Joining..." : "Join Infinity"}
+                {isNewsletterSubmitting ? "Subscribing..." : "Subscribe Now"}
               </Button>
             </form>
-
-            <p className="text-sm text-muted-foreground">
-              Join 50,000+ innovators, developers, and tech enthusiasts already part of our global community
-            </p>
           </motion.div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="py-12 bg-background border-t border-border">
+        <div className="container mx-auto px-4 text-center text-muted-foreground">
+          <p className="text-sm">&copy; {new Date().getFullYear()} Infinity Tech Society. All rights reserved.</p>
         </div>
       </div>
     </div>

@@ -1,148 +1,117 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useState, useEffect } from "react"
-import { getSupabaseClient } from "@/lib/supabase-service"
-
-export type UserRole = "admin" | "teacher" | "student"
-
-export interface User {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-  roll_number?: string
-  department?: string
-  specialization?: string
-  area_of_work?: string
-  level?: number
-  points?: number
-  progress?: number
-  avatar_url?: string
-  is_active?: boolean
-}
+import { createContext, useContext, useEffect, useState } from "react"
+import type { User } from "firebase/auth"
+import { onAuthStateChange, signIn, signOutUser, getUserProfile, type UserProfile } from "@/lib/auth-service"
+import { useToast } from "@/hooks/use-toast"
 
 interface AuthContextType {
   user: User | null
-  login: (identifier: string, password: string) => Promise<boolean>
-  logout: () => void
-  isLoading: boolean
+  profile: UserProfile | null
+  login: (email: string, password: string) => Promise<boolean>
+  logout: () => Promise<void>
+  loading: boolean
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  profile: null,
+  login: async () => false,
+  logout: async () => {},
+  loading: true,
+})
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
 
   useEffect(() => {
-    // Check for existing session
-    const savedUser = localStorage.getItem("avasya_user")
-    if (savedUser) {
+    // Check for stored auth in localStorage (for mock auth)
+    const storedAuth = localStorage.getItem("mockAuth")
+    if (storedAuth) {
       try {
-        setUser(JSON.parse(savedUser))
+        const { mockUser, mockProfile } = JSON.parse(storedAuth)
+        setUser(mockUser as User)
+        setProfile(mockProfile as UserProfile)
       } catch (error) {
-        console.error("Error parsing saved user:", error)
-        localStorage.removeItem("avasya_user")
+        console.error("Failed to parse stored auth:", error)
+        localStorage.removeItem("mockAuth")
       }
     }
-    setIsLoading(false)
-  }, [])
 
-  const login = async (identifier: string, password: string): Promise<boolean> => {
-    try {
-      setIsLoading(true)
+    // Set up Firebase auth state listener
+    const unsubscribe = onAuthStateChange(async (authUser) => {
+      setLoading(true)
 
-      // Check for admin login
-      if (identifier === "admin@kar" && password === "99976") {
-        const adminUser: User = {
-          id: "admin-001",
-          name: "AVASYA Administrator",
-          email: "admin@kar",
-          role: "admin",
-          level: 10,
-          points: 9999,
-          progress: 100,
-          is_active: true,
+      if (authUser) {
+        try {
+          const userProfile = await getUserProfile(authUser.uid, authUser.email || "")
+          setUser(authUser)
+          setProfile(userProfile)
+        } catch (error) {
+          console.error("Error fetching user profile:", error)
+          toast({
+            title: "Error",
+            description: "Failed to load user profile",
+            variant: "destructive",
+          })
         }
-
-        setUser(adminUser)
-        localStorage.setItem("avasya_user", JSON.stringify(adminUser))
-        setIsLoading(false)
-        return true
+      } else {
+        setUser(null)
+        setProfile(null)
       }
 
-      // Regular user login
-      const supabase = getSupabaseClient()
+      setLoading(false)
+    })
 
-      // Try to find user by email or roll number
-      const { data: users, error } = await supabase
-        .from("users")
-        .select("*")
-        .or(`email.eq.${identifier},roll_number.eq.${identifier}`)
-        .eq("is_active", true)
-        .limit(1)
+    return () => unsubscribe()
+  }, [toast])
 
-      if (error) {
-        console.error("Login error:", error)
-        setIsLoading(false)
-        return false
+  const login = async (email: string, password: string) => {
+    try {
+      const { user: authUser, profile: userProfile } = await signIn(email, password)
+
+      setUser(authUser)
+      setProfile(userProfile)
+
+      // Store mock auth in localStorage if needed
+      if (authUser.uid.startsWith("mock-")) {
+        localStorage.setItem(
+          "mockAuth",
+          JSON.stringify({
+            mockUser: { uid: authUser.uid, email: authUser.email },
+            mockProfile: userProfile,
+          }),
+        )
       }
 
-      if (!users || users.length === 0) {
-        setIsLoading(false)
-        return false
-      }
-
-      const userData = users[0]
-
-      // Check password (last 4 digits of roll number)
-      const expectedPassword = userData.roll_number?.slice(-4) || "0000"
-      if (password !== expectedPassword) {
-        setIsLoading(false)
-        return false
-      }
-
-      // Create user object
-      const loggedInUser: User = {
-        id: userData.id,
-        name: userData.name,
-        email: userData.email,
-        role: userData.role || "student",
-        roll_number: userData.roll_number,
-        department: userData.department,
-        specialization: userData.specialization,
-        area_of_work: userData.area_of_work,
-        level: userData.level || 1,
-        points: userData.points || 0,
-        progress: userData.progress || 0,
-        avatar_url: userData.avatar_url,
-        is_active: userData.is_active,
-      }
-
-      setUser(loggedInUser)
-      localStorage.setItem("avasya_user", JSON.stringify(loggedInUser))
-      setIsLoading(false)
       return true
     } catch (error) {
       console.error("Login error:", error)
-      setIsLoading(false)
       return false
     }
   }
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem("avasya_user")
+  const logout = async () => {
+    try {
+      await signOutUser()
+      setUser(null)
+      setProfile(null)
+      localStorage.removeItem("mockAuth")
+    } catch (error) {
+      console.error("Logout error:", error)
+      toast({
+        title: "Error",
+        description: "Failed to log out",
+        variant: "destructive",
+      })
+    }
   }
 
-  return <AuthContext.Provider value={{ user, login, logout, isLoading }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, profile, login, logout, loading }}>{children}</AuthContext.Provider>
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
-  }
-  return context
-}
+export const useAuth = () => useContext(AuthContext)

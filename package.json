@@ -52,6 +52,7 @@
     "expo-asset": "latest",
     "expo-file-system": "latest",
     "expo-gl": "latest",
+    "firebase": "latest",
     "framer-motion": "latest",
     "input-otp": "latest",
     "lucide-react": "^0.454.0",
